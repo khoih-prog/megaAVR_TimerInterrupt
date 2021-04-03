@@ -136,7 +136,7 @@ The catch is your function is now part of an ISR (Interrupt Service Routine), an
 ## Prerequisites
 
 1. [`Arduino IDE 1.8.13+` for Arduino](https://www.arduino.cc/en/Main/Software)
-2. [`Arduino megaAVR core 1.8.7+`](https://github.com/khoih-prog/ArduinoCore-megaavr) for Arduino megaAVR boards. Use Arduino Board Manager to install. [![Latest release](https://img.shields.io/github/release/arduino/ArduinoCore-megaavr.svg)](https://github.com/arduino/ArduinoCore-megaavr/releases/latest/)
+2. [`Arduino megaAVR core 1.8.7+`](https://github.com/arduino/ArduinoCore-megaavr/releases) for Arduino megaAVR boards. Use Arduino Board Manager to install.
 
 ---
 ---
