@@ -52,7 +52,7 @@
   * [ 16. TimerInterruptTest](examples/TimerInterruptTest)
 * [Example ISR_16_Timers_Array_Complex](#example-isr_16_timers_array_complex)
 * [Debug Terminal Output Samples](#debug-terminal-output-samples)
-  * [1. ISR_16_Timers_Array_Complex on Arduino AVR Nano-V3 board](#1-isr_16_timers_array_complex-on-arduino-avr-nano-v3-board)
+  * [1. ISR_16_Timers_Array_Complex on Arduino megaAVR UNO WiFi Rev2](#1-isr_16_timers_array_complex-arduino-megaavr-uno-wifi-rev2)
   * [2. Change_Interval on Arduino megaAVR UNO WiFi Rev2](#2-change_interval-on-arduino-megaavr-uno-wifi-rev2)
 * [Debug](#debug)
 * [Troubleshooting](#troubleshooting)
@@ -72,7 +72,7 @@
 
 ### Features
 
-This library enables you to use Interrupt from Hardware Timers on an ATmega4809-based boards, such as Arduino megaAVR : Nano WiFi Rev2, AVR_NANO_EVERY, etc.
+This library enables you to use Interrupt from Hardware Timers on an ATmega4809-based boards, such as Arduino megaAVR : UNO WiFi Rev2, AVR_NANO_EVERY, etc.
 
 As **Hardware Timers are rare, and very precious assets** of any board, this library now enables you to use up to **16 ISR-based Timers, while consuming only 1 Hardware Timer**. Timers' interval is very long (**ulong millisecs**).
 
@@ -115,7 +115,7 @@ The catch is your function is now part of an ISR (Interrupt Service Routine), an
 
 ### Currently supported Boards
 
-- **Arduino Nano WiFi Rev2, AVR_NANO_EVERY, etc.**
+- **Arduino UNO WiFi Rev2, AVR_NANO_EVERY, etc.**
 - ATmega4809-based boards.
 
 ---
@@ -125,7 +125,7 @@ The catch is your function is now part of an ISR (Interrupt Service Routine), an
 
 ### Initial Release v1.0.0
 
-1. Intial release to support to ATmega4809-based boards, such as **Arduino Nano WiFi Rev2, AVR_NANO_EVERY, etc.**
+1. Intial release to support to ATmega4809-based boards, such as **Arduino UNO WiFi Rev2, AVR_NANO_EVERY, etc.**
 2. New examples to support Blynk using [**WiFiNINA_Generic**](https://github.com/khoih-prog/WiFiNINA_Generic) and [**Blynk_WiFiNINA_WM**](https://github.com/khoih-prog/Blynk_WiFiNINA_WM) libraries.
 
 
@@ -943,7 +943,7 @@ Sometimes, the library will only work if you update the board core to the latest
 
 ### Initial Release v1.0.0
 
-1. Intial release to support to ATmega4809-based boards, such as **Arduino Nano WiFi Rev2, AVR_NANO_EVERY, etc.**
+1. Intial release to support to ATmega4809-based boards, such as **Arduino UNO WiFi Rev2, AVR_NANO_EVERY, etc.**
 2. New examples to support Blynk using [**WiFiNINA_Generic**](https://github.com/khoih-prog/WiFiNINA_Generic) and [**Blynk_WiFiNINA_WM**](https://github.com/khoih-prog/Blynk_WiFiNINA_WM) libraries.
 
 The [**ISR_Timer_Complex**](examples/ISR_Timer_Complex) example will demonstrate the nearly perfect accuracy compared to software timers by printing the actual elapsed millisecs of each type of timers.
@@ -958,7 +958,7 @@ in loop(), using delay() function as an example. The elapsed time then is very u
 
 ### Currently supported Boards
 
-- **Arduino Nano WiFi Rev2, AVR_NANO_EVERY, etc.**
+- **Arduino UNO WiFi Rev2, AVR_NANO_EVERY, etc.**
 - ATmega4809-based boards.
 
 ---
@@ -985,7 +985,7 @@ Submit issues to: [megaAVR_TimerInterrupt issues](https://github.com/khoih-prog/
 4. Fix some bugs in v1.0.0
 5. Add more examples.
 6. Similar library for ESP32, ESP8266, SAMD21/SAMD51, nRF52, Mbed-OS Nano-33-BLE, STM32
-7. Add support to ATmega4809-based boards, such as **Arduino Nano WiFi Rev2, AVR_NANO_EVERY, etc.**
+7. Add support to ATmega4809-based boards, such as **Arduino UNO WiFi Rev2, AVR_NANO_EVERY, etc.**
 
 ---
 ---
