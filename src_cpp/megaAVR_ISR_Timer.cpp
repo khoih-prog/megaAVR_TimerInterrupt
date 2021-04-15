@@ -1,5 +1,5 @@
 /****************************************************************************************************************************
-  megaAVR_ISR_Timer-Impl.h
+  megaAVR_ISR_Timer.cpp
   For Arduino megaAVR ATMEGA4809-based boards (UNO WiFi Rev2, NANO_EVERY, etc. )
   Written by Khoi Hoang
 
@@ -20,12 +20,7 @@
   1.1.0   K.Hoang      14/04/2021 Fix bug. Don't use v1.0.0
 *****************************************************************************************************************************/
 
-#pragma once
-
-#ifndef MEGA_AVR_ISR_TIMER_IMPL_H
-#define MEGA_AVR_ISR_TIMER_IMPL_H
-
-//#include "megaAVR_ISR_Timer.h"
+#include "megaAVR_ISR_Timer.h"
 #include <string.h>
 
 // Select time function:
@@ -336,4 +331,4 @@ unsigned ISR_Timer::getNumTimers()
   return numTimers;
 }
 
-#endif  // MEGA_AVR_ISR_TIMER_IMPL_H
+

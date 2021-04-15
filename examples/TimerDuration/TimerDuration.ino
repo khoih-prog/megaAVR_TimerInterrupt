@@ -22,8 +22,8 @@
 // These define's must be placed at the beginning before #include "megaAVR_TimerInterrupt.h"
 // _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
 // Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
-#define TIMER_INTERRUPT_DEBUG         0
-#define _TIMERINTERRUPT_LOGLEVEL_     0
+#define TIMER_INTERRUPT_DEBUG         4
+#define _TIMERINTERRUPT_LOGLEVEL_     4
 
 #define USE_TIMER_0     false
 #define USE_TIMER_1     true
@@ -69,7 +69,7 @@ void TimerHandler2(unsigned int outputPin = LED_BUILTIN)
     pinMode(outputPin, OUTPUT);
   }
 
-#if !(TIMER_INTERRUPT_DEBUG > 1)
+#if (TIMER_INTERRUPT_DEBUG > 1)
   Serial.print("ITimer2 called, millis() = "); Serial.println(millis());
 #endif
 

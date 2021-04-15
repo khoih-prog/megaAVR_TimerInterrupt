@@ -20,12 +20,7 @@
   1.1.0   K.Hoang      14/04/2021 Fix bug. Don't use v1.0.0
 ****************************************************************************************************************************/
 
-#pragma once
-
-#ifndef MEGA_AVR_TIMERINTERRUPT_IMPL_H
-#define MEGA_AVR_TIMERINTERRUPT_IMPL_H
-
-//#include "megaAVR_TimerInterrupt.h"
+#include "megaAVR_TimerInterrupt.h"
 
 #ifndef TIMER_INTERRUPT_DEBUG
   #define TIMER_INTERRUPT_DEBUG      0
@@ -227,4 +222,3 @@ void TimerInterrupt::resumeTimer(void)
   reattachInterrupt();
 }
 
-#endif // MEGA_AVR_TIMERINTERRUPT_IMPL_H

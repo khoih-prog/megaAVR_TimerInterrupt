@@ -12,11 +12,12 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 1.0.0
+  Version: 1.1.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0   K.Hoang      01/04/2021 Initial coding to support Arduino megaAVR ATmega4809-based boards (UNO WiFi Rev2, etc.)
+  1.1.0   K.Hoang      14/04/2021 Fix bug. Don't use v1.0.0
 ****************************************************************************************************************************/
 
 #pragma once
@@ -55,6 +56,14 @@ void TimerInterrupt::init(int8_t timer)
   TimerTCB[timer]->CTRLA    = TCB_CLKSEL_CLKTCA_gc | TCB_ENABLE_bm;       // Use Timer A as clock, enable timer
 
   TISR_LOGWARN1(F("TCB"), timer);
+  
+  TISR_LOGDEBUG(F("=================="));
+  TISR_LOGDEBUG1(F("Init, Timer ="), timer);
+  TISR_LOGDEBUG1(F("CTRLB   ="), TimerTCB[timer]->CTRLB);
+  TISR_LOGDEBUG1(F("CCMP    ="), TimerTCB[timer]->CCMP);
+  TISR_LOGDEBUG1(F("INTCTRL ="), TimerTCB[timer]->INTCTRL);
+  TISR_LOGDEBUG1(F("CTRLA   ="), TimerTCB[timer]->CTRLA);
+  TISR_LOGDEBUG(F("=================="));
    
   _timer = timer;
 
@@ -75,6 +84,16 @@ void TimerInterrupt::set_CCMP()
   _CCMPValueRemaining -= _CCMPValueToUse;
    
   TimerTCB[_timer]->CCMP     = _CCMPValueToUse;    // Value to compare with.
+  
+  TimerTCB[_timer]->INTCTRL = TCB_CAPT_bm; // Enable the interrupt
+  
+  TISR_LOGDEBUG(F("=================="));
+  TISR_LOGDEBUG1(F("set_CCMP, Timer ="), _timer);
+  TISR_LOGDEBUG1(F("CTRLB   ="), TimerTCB[_timer]->CTRLB);
+  TISR_LOGDEBUG1(F("CCMP    ="), TimerTCB[_timer]->CCMP);
+  TISR_LOGDEBUG1(F("INTCTRL ="), TimerTCB[_timer]->INTCTRL);
+  TISR_LOGDEBUG1(F("CTRLA   ="), TimerTCB[_timer]->CTRLA);
+  TISR_LOGDEBUG(F("=================="));
 
   // Flag _CCMPValue == 0 => end of long timer
   if (_CCMPValueRemaining == 0)
@@ -101,6 +120,8 @@ bool TimerInterrupt::setFrequency(float frequency, timer_callback_p callback, ui
   // Limit frequency to larger than (0.00372529 / 64) Hz or interval 17179.840s / 17179840 ms to avoid uint32_t overflow
   if ((_timer <= 0) || (callback == NULL) || ((frequencyLimit) < 1) )
   {
+    TISR_LOGDEBUG(F("setFrequency error"));
+    
     return false;
   }
   else      
@@ -115,6 +136,8 @@ bool TimerInterrupt::setFrequency(float frequency, timer_callback_p callback, ui
            
       if (_toggle_count < 1)
       {
+        TISR_LOGDEBUG(F("setFrequency: _toggle_count < 1 error"));
+        
         return false;
       }
     }
@@ -135,7 +158,10 @@ bool TimerInterrupt::setFrequency(float frequency, timer_callback_p callback, ui
     _timerDone = false;
     
     
-    _CCMPValueRemaining = (uint32_t) (CLK_TCA_FREQ / frequency);
+    _CCMPValue = _CCMPValueRemaining = (uint32_t) (CLK_TCA_FREQ / frequency);
+    
+    TISR_LOGDEBUG3(F("Frequency ="), frequency, F(", CLK_TCA_FREQ ="), CLK_TCA_FREQ);
+    TISR_LOGDEBUG1(F("setFrequency: _CCMPValueRemaining = "), _CCMPValueRemaining);
                 
     // Set the CCMP for the given timer,
     // set the toggle count,

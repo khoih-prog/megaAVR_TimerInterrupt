@@ -53,8 +53,8 @@
 #endif
 
 
-#define TIMER1_INTERVAL_MS        100UL
-#define TIMER2_INTERVAL_MS        200UL
+#define TIMER1_INTERVAL_MS        1000UL
+#define TIMER2_INTERVAL_MS        2000UL
 
 volatile uint32_t Timer1Count = 0;
 volatile uint32_t Timer2Count = 0;

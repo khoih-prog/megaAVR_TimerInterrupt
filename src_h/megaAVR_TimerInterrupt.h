@@ -12,11 +12,12 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 1.0.0
+  Version: 1.1.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0   K.Hoang      01/04/2021 Initial coding to support Arduino megaAVR ATmega4809-based boards (UNO WiFi Rev2, etc.)
+  1.1.0   K.Hoang      14/04/2021 Fix bug. Don't use v1.0.0
 ****************************************************************************************************************************/
 
 #pragma once
@@ -37,7 +38,7 @@
 #include "TimerInterrupt_Generic_Debug.h"
 
 #ifndef MEGA_AVR_TIMER_INTERRUPT_VERSION
-  #define MEGA_AVR_TIMER_INTERRUPT_VERSION       "megaAVR_TimerInterrupt v1.0.0"
+  #define MEGA_AVR_TIMER_INTERRUPT_VERSION       "megaAVR_TimerInterrupt v1.1.0"
 #endif
 
 #include <avr/interrupt.h>
@@ -247,6 +248,7 @@ class TimerInterrupt
       {
         // Reset value for next cycle
         _CCMPValueRemaining = _CCMPValue;
+        TISR_LOGDEBUG1(F("adjust_CCMPValue: reset _CCMPValueRemaining = "), _CCMPValue);
         _timerDone = true;
       }
       else
@@ -346,6 +348,9 @@ class TimerInterrupt
           ITimer0.detachInterrupt();
         }
       }
+      
+      // Clear interrupt flag
+      TCB0.INTFLAGS = TCB_CAPT_bm;
     }
   #endif  //#ifndef TIMER0_INSTANTIATED
 #endif    //#if USE_TIMER_0
@@ -394,6 +399,9 @@ class TimerInterrupt
         ITimer1.detachInterrupt();
       }
     }
+    
+    // Clear interrupt flag
+    TCB1.INTFLAGS = TCB_CAPT_bm;
   }
   
 #endif  //#ifndef TIMER1_INSTANTIATED
@@ -438,6 +446,9 @@ class TimerInterrupt
         ITimer2.detachInterrupt();
       }
     }
+    
+    // Clear interrupt flag
+    TCB2.INTFLAGS = TCB_CAPT_bm;
   }    
 #endif  //#ifndef TIMER2_INSTANTIATED
 #endif    //#if USE_TIMER_2
@@ -484,6 +495,9 @@ class TimerInterrupt
           ITimer3.detachInterrupt();
         }
       }
+      
+      // Clear interrupt flag
+      TCB3.INTFLAGS = TCB_CAPT_bm;
     }  
     
   #endif  //#ifndef TIMER3_INSTANTIATED

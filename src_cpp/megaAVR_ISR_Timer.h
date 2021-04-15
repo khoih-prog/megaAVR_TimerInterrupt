@@ -170,6 +170,5 @@ class ISR_Timer
     volatile int numTimers;
 };
 
-#include "megaAVR_ISR_Timer-Impl.h"
 
 #endif  // MEGA_AVR_ISR_TIMER_H

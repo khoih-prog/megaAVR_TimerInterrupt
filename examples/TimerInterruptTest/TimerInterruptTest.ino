@@ -22,8 +22,8 @@
 // These define's must be placed at the beginning before #include "megaAVR_TimerInterrupt.h"
 // _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
 // Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
-#define TIMER_INTERRUPT_DEBUG         0
-#define _TIMERINTERRUPT_LOGLEVEL_     0
+#define TIMER_INTERRUPT_DEBUG         2
+#define _TIMERINTERRUPT_LOGLEVEL_     4
 
 #define USE_TIMER_0     false
 #define USE_TIMER_1     true
@@ -85,9 +85,12 @@ unsigned int outputPin2 = A0;
 #define TIMER1_FREQUENCY      (float) (1000.0f / TIMER1_INTERVAL_MS)
 #define TIMER1_DURATION_MS    0 //(10 * TIMER1_INTERVAL_MS)
 
-#define TIMER2_INTERVAL_MS    13000
+#define TIMER2_INTERVAL_MS    150000
 #define TIMER2_FREQUENCY      (float) (1000.0f / TIMER2_INTERVAL_MS)
 #define TIMER2_DURATION_MS    0   //(20 * TIMER2_INTERVAL_MS)
+
+
+#define ADJUST_FACTOR         ( (float) 0.99850 )
 
 void setup()
 {
@@ -97,7 +100,9 @@ void setup()
   Serial.println(F("\nStarting TimerInterruptTest on megaAVR"));
   Serial.println(MEGA_AVR_TIMER_INTERRUPT_VERSION);
   Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
-
+  
+  Serial.print(F("CPU ADJUST_FACTOR = ")); Serial.println(ADJUST_FACTOR);
+  
   // Timer0 is used for micros(), millis(), delay(), etc and can't be used
   // Select Timer 1-2 for UNO, 0-5 for MEGA
   // Timer 2 is 8-bit timer, only for higher frequency
@@ -106,7 +111,7 @@ void setup()
 
   // Using ATmega328 used in UNO => 16MHz CPU clock ,
 
-  if (ITimer1.attachInterruptInterval(TIMER1_INTERVAL_MS, TimerHandler1, outputPin1, TIMER1_DURATION_MS))
+  if (ITimer1.attachInterruptInterval(TIMER1_INTERVAL_MS * ADJUST_FACTOR, TimerHandler1, outputPin1, TIMER1_DURATION_MS))
   {
     Serial.print(F("Starting  ITimer1 OK, millis() = ")); Serial.println(millis());
   }
@@ -117,7 +122,7 @@ void setup()
 
   ITimer2.init();
 
-  if (ITimer2.attachInterruptInterval(TIMER2_INTERVAL_MS, TimerHandler2, outputPin2, TIMER2_DURATION_MS))
+  if (ITimer2.attachInterruptInterval(TIMER2_INTERVAL_MS * ADJUST_FACTOR, TimerHandler2, outputPin2, TIMER2_DURATION_MS))
   {
     Serial.print(F("Starting  ITimer2 OK, millis() = ")); Serial.println(millis());
   }

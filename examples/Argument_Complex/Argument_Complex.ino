@@ -78,7 +78,7 @@ void TimerHandler1(unsigned int outputPinsAddress)
   toggle1 = !toggle1;
 }
 
-#define TIMER1_INTERVAL_MS    1000
+#define TIMER1_INTERVAL_MS    5000
 
 void setup()
 {

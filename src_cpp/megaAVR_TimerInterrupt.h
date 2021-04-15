@@ -504,6 +504,4 @@ class TimerInterrupt
 #endif    //#if USE_TIMER_3
 
 
-#include "megaAVR_TimerInterrupt-Impl.h"
-
 #endif      //#ifndef MEGA_AVR_TIMERINTERRUPT_H
