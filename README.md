@@ -14,6 +14,7 @@
   * [Important Notes about ISR](#important-notes-about-isr)
   * [Currently supported Boards](#currently-supported-boards)
 * [Changelog](#changelog)
+  * [Release v1.3.0](#release-v130)
   * [Release v1.2.0](#release-v120)
   * [Release v1.1.0](#release-v110)
   * [Initial Release v1.0.0](#initial-release-v100)
@@ -128,6 +129,11 @@ The catch is your function is now part of an ISR (Interrupt Service Routine), an
 ---
 
 ## Changelog
+
+### Release v1.3.0
+
+1. Fix TCB Clock bug. Don't use v1.2.0
+
 
 ### Release v1.2.0
 
@@ -793,7 +799,7 @@ While software timer, **programmed for 2s, is activated after more than 10.000s 
 ```
 
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.2.0
+megaAVR_TimerInterrupt v1.3.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 250KHz for lower accuracy but longer time
 Starting  ITimer1 OK, millis() = 6
@@ -945,7 +951,7 @@ The following is the sample terminal output when running example [Change_Interva
 
 ```
 Starting Change_Interval on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.2.0
+megaAVR_TimerInterrupt v1.3.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 250KHz for lower accuracy but longer time
 Starting  ITimer1 OK, millis() = 1
@@ -974,7 +980,7 @@ Changing Interval, Timer1 = 100,  Timer2 = 200
 
 ```
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.2.0
+megaAVR_TimerInterrupt v1.3.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 16MHz for highest accuracy
 Starting  ITimer1 OK, millis() = 6
@@ -1060,7 +1066,7 @@ Timer : 15, programmed : 80000, actual : 80000
 ```
 
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.2.0
+megaAVR_TimerInterrupt v1.3.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 8MHz for very high accuracy
 Starting  ITimer1 OK, millis() = 10
@@ -1128,7 +1134,7 @@ Timer : 15, programmed : 80000, actual : 80000
 
 ```
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.2.0
+megaAVR_TimerInterrupt v1.3.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 250KHz for lower accuracy but longer time
 Starting  ITimer1 OK, millis() = 11
@@ -1239,6 +1245,10 @@ Sometimes, the library will only work if you update the board core to the latest
 ---
 
 ## Releases
+
+### Release v1.3.0
+
+1. Fix TCB Clock bug. Don't use v1.2.0
 
 ### Release v1.2.0
 

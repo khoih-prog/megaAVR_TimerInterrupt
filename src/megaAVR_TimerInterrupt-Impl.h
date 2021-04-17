@@ -12,13 +12,14 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 1.2.0
+  Version: 1.3.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0   K.Hoang      01/04/2021 Initial coding to support Arduino megaAVR ATmega4809-based boards (UNO WiFi Rev2, etc.)
   1.1.0   K.Hoang      14/04/2021 Fix bug. Don't use v1.0.0
   1.2.0   K.Hoang      17/04/2021 Selectable TCB Clock 16MHz, 8MHz or 250KHz depending on necessary accuracy
+  1.3.0   K.Hoang      17/04/2021 Fix TCB Clock bug. Don't use v1.2.0
 ****************************************************************************************************************************/
 
 #pragma once
@@ -67,24 +68,33 @@ typedef enum TCB_CNTMODE_enum
 
 TCB_t* TimerTCB[ NUM_HW_TIMERS ] = { &TCB0, &TCB1, &TCB2, &TCB3 };
 
+#define CLK_TCA_FREQ      (250000L)
+
 // Clock for UNO WiFi Rev2 and Nano Every is 16MHz
-#if USING_16MHZ  // Use no prescaler (prescaler 1) => 16MHz
+#if USING_16MHZ  
+  // Use no prescaler (prescaler 1) => 16MHz
   #warning Using no prescaler => 16MHz
   #define TCB_CLKSEL_VALUE      TCB_CLKSEL_CLKDIV1_gc
+  #define CLOCK_PRESCALER       1
 #elif USING_8MHZ
   // Use prescaler 2 => 8MHz
   #warning Using prescaler 2 => 8MHz
   #define TCB_CLKSEL_VALUE      TCB_CLKSEL_CLKDIV2_gc
+  #define CLOCK_PRESCALER       2
 #elif USING_250KHZ
   // Optional, but for clarity
   // Use Timer A as clock (prescaler 64) => 250KHz
   #warning Using prescaler 64 => 250KHz
   #define TCB_CLKSEL_VALUE      TCB_CLKSEL_CLKTCA_gc 
+  #define CLOCK_PRESCALER       64
 #else
   // Use Timer A as clock (prescaler 64) => 250KHz
   #warning Using prescaler 64 => 250KHz
   #define TCB_CLKSEL_VALUE      TCB_CLKSEL_CLKTCA_gc
+  #define CLOCK_PRESCALER       64
 #endif
+
+#define CLK_TCB_FREQ          ( F_CPU / CLOCK_PRESCALER )
 
 void TimerInterrupt::init(int8_t timer)
 {    
@@ -103,13 +113,13 @@ void TimerInterrupt::init(int8_t timer)
 
   TISR_LOGWARN1(F("TCB"), timer);
   
-  TISR_LOGDEBUG(F("=================="));
-  TISR_LOGDEBUG1(F("Init, Timer ="), timer);
-  TISR_LOGDEBUG1(F("CTRLB   ="), TimerTCB[timer]->CTRLB);
-  TISR_LOGDEBUG1(F("CCMP    ="), TimerTCB[timer]->CCMP);
-  TISR_LOGDEBUG1(F("INTCTRL ="), TimerTCB[timer]->INTCTRL);
-  TISR_LOGDEBUG1(F("CTRLA   ="), TimerTCB[timer]->CTRLA);
-  TISR_LOGDEBUG(F("=================="));
+  TISR_LOGINFO(F("=================="));
+  TISR_LOGINFO1(F("Init, Timer ="), timer);
+  TISR_LOGINFO1(F("CTRLB   ="), TimerTCB[timer]->CTRLB);
+  TISR_LOGINFO1(F("CCMP    ="), TimerTCB[timer]->CCMP);
+  TISR_LOGINFO1(F("INTCTRL ="), TimerTCB[timer]->INTCTRL);
+  TISR_LOGINFO1(F("CTRLA   ="), TimerTCB[timer]->CTRLA);
+  TISR_LOGINFO(F("=================="));
    
   _timer = timer;
 
@@ -132,12 +142,12 @@ void TimerInterrupt::set_CCMP()
   
   TimerTCB[_timer]->INTCTRL = TCB_CAPT_bm; // Enable the interrupt
   
-  TISR_LOGDEBUG(F("=================="));
-  TISR_LOGDEBUG1(F("set_CCMP, Timer ="), _timer);
-  TISR_LOGDEBUG1(F("CTRLB   ="), TimerTCB[_timer]->CTRLB);
-  TISR_LOGDEBUG1(F("CCMP    ="), TimerTCB[_timer]->CCMP);
-  TISR_LOGDEBUG1(F("INTCTRL ="), TimerTCB[_timer]->INTCTRL);
-  TISR_LOGDEBUG1(F("CTRLA   ="), TimerTCB[_timer]->CTRLA);
+  TISR_LOGINFO(F("=================="));
+  TISR_LOGINFO1(F("set_CCMP, Timer ="), _timer);
+  TISR_LOGINFO1(F("CTRLB   ="), TimerTCB[_timer]->CTRLB);
+  TISR_LOGINFO1(F("CCMP    ="), TimerTCB[_timer]->CCMP);
+  TISR_LOGINFO1(F("INTCTRL ="), TimerTCB[_timer]->INTCTRL);
+  TISR_LOGINFO1(F("CTRLA   ="), TimerTCB[_timer]->CTRLA);
   TISR_LOGDEBUG(F("=================="));
 
   // Flag _CCMPValue == 0 => end of long timer
@@ -150,13 +160,8 @@ void TimerInterrupt::set_CCMP()
 // Return true if frequency is OK with selected timer (CCMPValue is in range)
 bool TimerInterrupt::setFrequency(float frequency, timer_callback_p callback, uint32_t params, unsigned long duration)
 {
-
-#define CLK_TCA_FREQ      (250000L)
-
   bool isSuccess = false;
   
-  // Currently using CLK_TCA from TCA0 == 250KHz
-
   //frequencyLimit must > 1
   float frequencyLimit = frequency * 17179.840;
 
@@ -174,8 +179,8 @@ bool TimerInterrupt::setFrequency(float frequency, timer_callback_p callback, ui
     {   
       _toggle_count = frequency * duration / 1000;
 
-      TISR_LOGWARN1(F("setFrequency => _toggle_count ="), _toggle_count);
-      TISR_LOGWARN3(F("Frequency ="), frequency, F(", duration ="), duration);
+      TISR_LOGINFO1(F("setFrequency => _toggle_count ="), _toggle_count);
+      TISR_LOGINFO3(F("Frequency ="), frequency, F(", duration ="), duration);
            
       if (_toggle_count < 1)
       {
@@ -199,11 +204,10 @@ bool TimerInterrupt::setFrequency(float frequency, timer_callback_p callback, ui
 
     _timerDone = false;
     
-    
-    _CCMPValue = _CCMPValueRemaining = (uint32_t) (CLK_TCA_FREQ / frequency);
-    
-    TISR_LOGDEBUG3(F("Frequency ="), frequency, F(", CLK_TCA_FREQ ="), CLK_TCA_FREQ);
-    TISR_LOGDEBUG1(F("setFrequency: _CCMPValueRemaining = "), _CCMPValueRemaining);
+    _CCMPValue = _CCMPValueRemaining = (uint32_t) (CLK_TCB_FREQ / frequency);
+
+    TISR_LOGINFO3(F("Frequency ="), frequency, F(", CLK_TCB_FREQ ="), CLK_TCB_FREQ);
+    TISR_LOGINFO1(F("setFrequency: _CCMPValueRemaining = "), _CCMPValueRemaining);
                 
     // Set the CCMP for the given timer,
     // set the toggle count,
