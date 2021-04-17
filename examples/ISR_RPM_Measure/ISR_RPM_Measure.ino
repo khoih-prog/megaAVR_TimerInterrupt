@@ -12,11 +12,13 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 1.0.0
+  Version: 1.2.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0   K.Hoang      01/04/2021 Initial coding to support Arduino megaAVR ATmega4809-based boards (UNO WiFi Rev2, etc.)
+  1.1.0   K.Hoang      14/04/2021 Fix bug. Don't use v1.0.0
+  1.2.0   K.Hoang      17/04/2021 Selectable TCB Clock 16MHz, 8MHz or 250KHz depending on necessary accuracy
  *****************************************************************************************************************************/
 /* RPM Measuring uses high frequency hardware timer 1Hz == 1ms) to measure the time from of one rotation, in ms
    then convert to RPM. One rotation is detected by reading the state of a magnetic REED SW or IR LED Sensor
@@ -34,6 +36,14 @@
 // Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
 #define TIMER_INTERRUPT_DEBUG         0
 #define _TIMERINTERRUPT_LOGLEVEL_     0
+
+// Select USING_16MHZ     == true for  16MHz to Timer TCBx => shorter timer, but better accuracy
+// Select USING_8MHZ      == true for   8MHz to Timer TCBx => shorter timer, but better accuracy
+// Select USING_250KHZ    == true for 250KHz to Timer TCBx => shorter timer, but better accuracy
+// Not select for default 250KHz to Timer TCBx => longer timer,  but worse accuracy
+#define USING_16MHZ     true
+#define USING_8MHZ      false
+#define USING_250KHZ    false
 
 #define USE_TIMER_0     false
 #define USE_TIMER_1     true
@@ -122,9 +132,20 @@ void setup()
   Serial.begin(115200);
   while (!Serial);
 
-  Serial.println(F("\nStarting ISR_RPM_Measure on megaAVR"));
+  Serial.print(F("\nStarting ISR_RPM_Measure on "));
+  Serial.println(BOARD_NAME);
   Serial.println(MEGA_AVR_TIMER_INTERRUPT_VERSION);
   Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
+
+  Serial.print(F("TCB Clock Frequency = ")); 
+
+#if USING_16MHZ  
+  Serial.println(F("16MHz for highest accuracy"));
+#elif USING_8MHZ  
+  Serial.println(F("8MHz for very high accuracy"));
+#else
+  Serial.println(F("250KHz for lower accuracy but longer time"));
+#endif
 
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(interruptPin, INPUT_PULLUP);

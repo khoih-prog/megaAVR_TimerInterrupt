@@ -12,12 +12,13 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 1.1.0
+  Version: 1.2.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0   K.Hoang      01/04/2021 Initial coding to support Arduino megaAVR ATmega4809-based boards (UNO WiFi Rev2, etc.)
   1.1.0   K.Hoang      14/04/2021 Fix bug. Don't use v1.0.0
+  1.2.0   K.Hoang      17/04/2021 Selectable TCB Clock 16MHz, 8MHz or 250KHz depending on necessary accuracy
 ****************************************************************************************************************************/
 
 #pragma once
@@ -31,13 +32,59 @@
   #define TIMER_INTERRUPT_DEBUG      0
 #endif
 
-// From iom4809.h
-//#define TCB0                  (*(TCB_t *) 0x0A80) /* 16-bit Timer Type B */
-//#define TCB1                  (*(TCB_t *) 0x0A90) /* 16-bit Timer Type B */
-//#define TCB2                  (*(TCB_t *) 0x0AA0) /* 16-bit Timer Type B */
-//#define TCB3                  (*(TCB_t *) 0x0AB0) /* 16-bit Timer Type B */
+/*****************************************************************************************
+
+// From ~/.arduino15/packages/arduino/7.3.0-atmel3.6.1-arduino5/avr/include/avr/iom4809.h
+
+//#define TCB0                  (*(TCB_t *) 0x0A80) // 16-bit Timer Type B
+//#define TCB1                  (*(TCB_t *) 0x0A90) // 16-bit Timer Type B
+//#define TCB2                  (*(TCB_t *) 0x0AA0) // 16-bit Timer Type B
+//#define TCB3                  (*(TCB_t *) 0x0AB0) // 16-bit Timer Type B
+
+//
+typedef enum TCB_CLKSEL_enum
+{
+    TCB_CLKSEL_CLKDIV1_gc = (0x00<<1),  // CLK_PER (No Prescaling)
+    TCB_CLKSEL_CLKDIV2_gc = (0x01<<1),  // CLK_PER/2 (From Prescaler)
+    TCB_CLKSEL_CLKTCA_gc = (0x02<<1),   // Use Clock from TCA
+} TCB_CLKSEL_t;
+
+//
+typedef enum TCB_CNTMODE_enum
+{
+    TCB_CNTMODE_INT_gc = (0x00<<0),       // Periodic Interrupt
+    TCB_CNTMODE_TIMEOUT_gc = (0x01<<0),   // Periodic Timeout
+    TCB_CNTMODE_CAPT_gc = (0x02<<0),      // Input Capture Event
+    TCB_CNTMODE_FRQ_gc = (0x03<<0),       // Input Capture Frequency measurement
+    TCB_CNTMODE_PW_gc = (0x04<<0),        // Input Capture Pulse-Width measurement
+    TCB_CNTMODE_FRQPW_gc = (0x05<<0),     // Input Capture Frequency and Pulse-Width measurement
+    TCB_CNTMODE_SINGLE_gc = (0x06<<0),    // Single Shot
+    TCB_CNTMODE_PWM8_gc = (0x07<<0),      // 8-bit PWM
+} TCB_CNTMODE_t;
+
+*****************************************************************************************/
+
 
 TCB_t* TimerTCB[ NUM_HW_TIMERS ] = { &TCB0, &TCB1, &TCB2, &TCB3 };
+
+// Clock for UNO WiFi Rev2 and Nano Every is 16MHz
+#if USING_16MHZ  // Use no prescaler (prescaler 1) => 16MHz
+  #warning Using no prescaler => 16MHz
+  #define TCB_CLKSEL_VALUE      TCB_CLKSEL_CLKDIV1_gc
+#elif USING_8MHZ
+  // Use prescaler 2 => 8MHz
+  #warning Using prescaler 2 => 8MHz
+  #define TCB_CLKSEL_VALUE      TCB_CLKSEL_CLKDIV2_gc
+#elif USING_250KHZ
+  // Optional, but for clarity
+  // Use Timer A as clock (prescaler 64) => 250KHz
+  #warning Using prescaler 64 => 250KHz
+  #define TCB_CLKSEL_VALUE      TCB_CLKSEL_CLKTCA_gc 
+#else
+  // Use Timer A as clock (prescaler 64) => 250KHz
+  #warning Using prescaler 64 => 250KHz
+  #define TCB_CLKSEL_VALUE      TCB_CLKSEL_CLKTCA_gc
+#endif
 
 void TimerInterrupt::init(int8_t timer)
 {    
@@ -46,14 +93,13 @@ void TimerInterrupt::init(int8_t timer)
   // 8 bit timers will require changing prescalar values,
   // whereas 16 bit timers are set to either ck/1 or ck/64 prescalar
   
-  //cli();//stop interrupts
   noInterrupts();
    
   // 16 bit timer
   TimerTCB[timer]->CTRLB    = TCB_CNTMODE_INT_gc;                         // Use timer compare mode
   TimerTCB[timer]->CCMP     = MAX_COUNT_16BIT;                            // Value to compare with.
   TimerTCB[timer]->INTCTRL  &= ~TCB_CAPT_bm;                              // Disable the interrupt
-  TimerTCB[timer]->CTRLA    = TCB_CLKSEL_CLKTCA_gc | TCB_ENABLE_bm;       // Use Timer A as clock, enable timer
+  TimerTCB[timer]->CTRLA    = TCB_CLKSEL_VALUE | TCB_ENABLE_bm;       // Use Timer A as clock, enable timer
 
   TISR_LOGWARN1(F("TCB"), timer);
   
@@ -67,7 +113,6 @@ void TimerInterrupt::init(int8_t timer)
    
   _timer = timer;
 
-  //sei();//enable interrupts
   interrupts();
   
 }
@@ -108,8 +153,6 @@ bool TimerInterrupt::setFrequency(float frequency, timer_callback_p callback, ui
 
 #define CLK_TCA_FREQ      (250000L)
 
-  //uint8_t       andMask = 0b11111000;
-  unsigned long CCMPValue;
   bool isSuccess = false;
   
   // Currently using CLK_TCA from TCA0 == 250KHz
@@ -148,7 +191,6 @@ bool TimerInterrupt::setFrequency(float frequency, timer_callback_p callback, ui
       
     //Timer0-3 are 16 bit timers, meaning it can store a maximum counter value of 65535.
 
-    //cli();//stop interrupts
     noInterrupts();
 
     _frequency = frequency;
@@ -168,7 +210,6 @@ bool TimerInterrupt::setFrequency(float frequency, timer_callback_p callback, ui
     // then turn on the interrupts     
     set_CCMP();
     
-    //sei();//allow interrupts
     interrupts();
 
     return true;
@@ -177,7 +218,6 @@ bool TimerInterrupt::setFrequency(float frequency, timer_callback_p callback, ui
 
 void TimerInterrupt::detachInterrupt(void)
 {
-  //cli();//stop interrupts
   noInterrupts();
      
   // Clear interrupt flag
@@ -185,14 +225,12 @@ void TimerInterrupt::detachInterrupt(void)
   TimerTCB[_timer]->INTCTRL  &= ~TCB_CAPT_bm;    // Disable the interrupt
   TimerTCB[_timer]->CTRLA    &= ~TCB_ENABLE_bm;  // Disable timer
   
-  //sei();//allow interrupts
   interrupts();
 }
 
 // Duration (in milliseconds). Duration = 0 or not specified => run indefinitely
 void TimerInterrupt::reattachInterrupt(unsigned long duration)
 {
-  //cli();//stop interrupts
   noInterrupts();
 
   // Calculate the toggle count
@@ -206,11 +244,9 @@ void TimerInterrupt::reattachInterrupt(unsigned long duration)
   }
     
   // Set interrupt flag 
-  //TimerTCB[_timer]->INTFLAGS = TCB_CAPT_bm;
   TimerTCB[_timer]->INTCTRL  |= TCB_CAPT_bm;    // Enable the interrupt
   TimerTCB[_timer]->CTRLA    |= TCB_ENABLE_bm;  // Enable timer
   
-  //sei();//allow interrupts
   interrupts();
 }
 

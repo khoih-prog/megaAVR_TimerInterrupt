@@ -12,12 +12,13 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 1.1.0
+  Version: 1.2.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
   1.0.0   K.Hoang      01/04/2021 Initial coding to support Arduino megaAVR ATmega4809-based boards (UNO WiFi Rev2, etc.)
   1.1.0   K.Hoang      14/04/2021 Fix bug. Don't use v1.0.0
+  1.2.0   K.Hoang      17/04/2021 Selectable TCB Clock 16MHz, 8MHz or 250KHz depending on necessary accuracy
 ****************************************************************************************************************************/
 
 #pragma once
@@ -26,7 +27,15 @@
 #define MEGA_AVR_TIMERINTERRUPT_H
 
 #if ( defined(__AVR_ATmega4809__) || defined(ARDUINO_AVR_UNO_WIFI_REV2) || defined(ARDUINO_AVR_NANO_EVERY) )
-     
+  #if !defined(BOARD_NAME)
+    #if (ARDUINO_AVR_UNO_WIFI_REV2)
+      #define BOARD_NAME      "megaAVR UNO WiFi Rev2"
+    #elif (ARDUINO_AVR_NANO_EVERY)
+      #define BOARD_NAME      "megaAVR Nano Every"
+    #else
+      #define BOARD_NAME      "megaAVR Unknown"
+    #endif
+  #endif
 #else
   #error This is designed only for Arduino megaAVR board! Please check your Tools->Board setting.
 #endif
@@ -218,12 +227,10 @@ class TimerInterrupt
 
     void setCount(long countInput) __attribute__((always_inline))
     {
-      //cli();//stop interrupts
       //noInterrupts();
 
       _toggle_count = countInput;
 
-      //sei();//enable interrupts
       //interrupts();
     };
 
@@ -239,7 +246,6 @@ class TimerInterrupt
 
     void adjust_CCMPValue() //__attribute__((always_inline))
     {
-      //cli();//stop interrupts
       noInterrupts();
 
       _CCMPValueRemaining -= min(MAX_COUNT_16BIT, _CCMPValueRemaining);
@@ -254,13 +260,11 @@ class TimerInterrupt
       else
         _timerDone = false;
 
-      //sei();//enable interrupts
       interrupts();
     };
 
     void reload_CCMPValue() //__attribute__((always_inline))
     {
-      //cli();//stop interrupts
       noInterrupts();
 
       // Reset value for next cycle, have to deduct the value already loaded to CCMP register
@@ -269,7 +273,6 @@ class TimerInterrupt
 
       _timerDone = false;
 
-      //sei();//enable interrupts
       interrupts();
     };
 

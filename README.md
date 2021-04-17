@@ -14,6 +14,7 @@
   * [Important Notes about ISR](#important-notes-about-isr)
   * [Currently supported Boards](#currently-supported-boards)
 * [Changelog](#changelog)
+  * [Release v1.2.0](#release-v120)
   * [Release v1.1.0](#release-v110)
   * [Initial Release v1.0.0](#initial-release-v100)
 * [Prerequisites](#prerequisites)
@@ -53,8 +54,12 @@
   * [ 16. TimerInterruptTest](examples/TimerInterruptTest)
 * [Example ISR_16_Timers_Array_Complex](#example-isr_16_timers_array_complex)
 * [Debug Terminal Output Samples](#debug-terminal-output-samples)
-  * [1. ISR_16_Timers_Array_Complex on Arduino megaAVR UNO WiFi Rev2](#1-isr_16_timers_array_complex-arduino-megaavr-uno-wifi-rev2)
-  * [2. Change_Interval on Arduino megaAVR UNO WiFi Rev2](#2-change_interval-on-arduino-megaavr-uno-wifi-rev2)
+  * [1. ISR_16_Timers_Array_Complex on Arduino megaAVR Nano Every](#1-isr_16_timers_array_complex-on-arduino-megaavr-nano-every)
+  * [2. Change_Interval on Arduino megaAVR Nano Every](#2-change_interval-on-arduino-megaavr-nano-every)
+  * [3. ISR_16_Timers_Array_Complex on Arduino megaAVR Nano Every to show accuracy difference](#3-isr_16_timers_array_complex-on-arduino-megaavr-nano-every-to-show-accuracy-difference)
+    * [3.1 TCB Clock Frequency 16MHz for highest accuracy](#31-tcb-clock-frequency-16mhz-for-highest-accuracy)
+    * [3.2 TCB Clock Frequency 8MHz for very high accuracy](#32-tcb-clock-frequency-8mhz-for-very-high-accuracy)
+    * [3.3 TCB Clock Frequency 250KHz for lower accuracy but longer time](#33-tcb-clock-frequency-250khz-for-lower-accuracy-but-longer-time)
 * [Debug](#debug)
 * [Troubleshooting](#troubleshooting)
 * [Releases](#releases)
@@ -123,6 +128,11 @@ The catch is your function is now part of an ISR (Interrupt Service Routine), an
 ---
 
 ## Changelog
+
+### Release v1.2.0
+
+1. Selectable **TCB Clock 16MHz, 8MHz or 250KHz** depending on necessary accuracy
+2. Add BOARD_NAME definition
 
 ### Release v1.1.0
 
@@ -219,6 +229,14 @@ Before using any Timer, you have to make sure the Timer has not been used by any
 ### 1.1 Init Hardware Timer
 
 ```
+// Select USING_16MHZ     == true for  16MHz to Timer TCBx => shorter timer, but better accuracy
+// Select USING_8MHZ      == true for   8MHz to Timer TCBx => shorter timer, but better accuracy
+// Select USING_250KHZ    == true for 250KHz to Timer TCBx => shorter timer, but better accuracy
+// Not select for default 250KHz to Timer TCBx => longer timer,  but worse accuracy
+#define USING_16MHZ     true
+#define USING_8MHZ      false
+#define USING_250KHZ    false
+
 // Select the timers you're using, here ITimer1
 #define USE_TIMER_0     false
 #define USE_TIMER_1     true
@@ -319,6 +337,14 @@ The 16 ISR_based Timers, designed for long timer intervals, only support using *
 ### 2.2 Init Hardware Timer and ISR-based Timer
 
 ```
+// Select USING_16MHZ     == true for  16MHz to Timer TCBx => shorter timer, but better accuracy
+// Select USING_8MHZ      == true for   8MHz to Timer TCBx => shorter timer, but better accuracy
+// Select USING_250KHZ    == true for 250KHz to Timer TCBx => shorter timer, but better accuracy
+// Not select for default 250KHz to Timer TCBx => longer timer,  but worse accuracy
+#define USING_16MHZ     true
+#define USING_8MHZ      false
+#define USING_250KHZ    false
+
 #define USE_TIMER_0     false
 #define USE_TIMER_1     true
 #define USE_TIMER_2     false
@@ -421,6 +447,15 @@ void setup()
 // Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
 #define TIMER_INTERRUPT_DEBUG         0
 #define _TIMERINTERRUPT_LOGLEVEL_     0
+
+// Select USING_16MHZ     == true for  16MHz to Timer TCBx => shorter timer, but better accuracy
+// Select USING_8MHZ      == true for   8MHz to Timer TCBx => shorter timer, but better accuracy
+// Select USING_250KHZ    == true for 250KHz to Timer TCBx => shorter timer, but better accuracy
+// Not select for default 250KHz to Timer TCBx => longer timer,  but worse accuracy
+#define USING_16MHZ     true
+#define USING_8MHZ      false
+#define USING_250KHZ    false
+
 
 #define USE_TIMER_0     false
 #define USE_TIMER_1     true
@@ -684,9 +719,20 @@ void setup()
   Serial.begin(115200);
   while (!Serial);
 
-  Serial.println(F("\nStarting ISR_16_Timers_Array_Complex on AVR"));
+  Serial.print(F("\nStarting ISR_16_Timers_Array_Complex on "));
+  Serial.println(BOARD_NAME);
   Serial.println(MEGA_AVR_TIMER_INTERRUPT_VERSION);
   Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
+
+  Serial.print(F("TCB Clock Frequency = ")); 
+
+#if USING_16MHZ  
+  Serial.println(F("16MHz for highest accuracy"));
+#elif USING_8MHZ  
+  Serial.println(F("8MHz for very high accuracy"));
+#else
+  Serial.println(F("250KHz for lower accuracy but longer time"));
+#endif
 
   ITimer1.init();
 
@@ -746,9 +792,10 @@ While software timer, **programmed for 2s, is activated after more than 10.000s 
 
 ```
 
-Starting ISR_16_Timers_Array_Complex on megaAVR
-megaAVR_TimerInterrupt v1.1.0
+Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
+megaAVR_TimerInterrupt v1.2.0
 CPU Frequency = 16 MHz
+TCB Clock Frequency = 250KHz for lower accuracy but longer time
 Starting  ITimer1 OK, millis() = 6
 SimpleTimer : 2, ms : 10006, Dms : 10006
 Timer : 0, programmed : 5000, actual : 5006
@@ -897,9 +944,10 @@ Timer : 15, programmed : 80000, actual : 80016
 The following is the sample terminal output when running example [Change_Interval](examples/Change_Interval) on **Arduino megaAVR Nano Every** to demonstrate how to change Timer Interval on-the-fly
 
 ```
-Starting Change_Interval on megaAVR
-megaAVR_TimerInterrupt v1.1.0
+Starting Change_Interval on megaAVR Nano Every
+megaAVR_TimerInterrupt v1.2.0
 CPU Frequency = 16 MHz
+TCB Clock Frequency = 250KHz for lower accuracy but longer time
 Starting  ITimer1 OK, millis() = 1
 Starting  ITimer2 OK, millis() = 4
 Time = 10001, Timer1Count = 97, Timer2Count = 49
@@ -915,6 +963,250 @@ Time = 70008, Timer1Count = 538, Timer2Count = 271
 Time = 80009, Timer1Count = 588, Timer2Count = 296
 Changing Interval, Timer1 = 100,  Timer2 = 200
 ```
+
+---
+
+### 3. ISR_16_Timers_Array_Complex on Arduino megaAVR Nano Every to show accuracy difference.
+
+
+### 3.1. TCB Clock Frequency 16MHz for highest accuracy
+
+
+```
+Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
+megaAVR_TimerInterrupt v1.2.0
+CPU Frequency = 16 MHz
+TCB Clock Frequency = 16MHz for highest accuracy
+Starting  ITimer1 OK, millis() = 6
+SimpleTimer : 2, ms : 10007, Dms : 10007
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 10006
+Timer : 2, programmed : 15000, actual : 0
+Timer : 3, programmed : 20000, actual : 0
+Timer : 4, programmed : 25000, actual : 0
+Timer : 5, programmed : 30000, actual : 0
+Timer : 6, programmed : 35000, actual : 0
+Timer : 7, programmed : 40000, actual : 0
+Timer : 8, programmed : 45000, actual : 0
+Timer : 9, programmed : 50000, actual : 0
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2, ms : 20066, Dms : 10059
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 10000
+Timer : 2, programmed : 15000, actual : 15006
+Timer : 3, programmed : 20000, actual : 20006
+Timer : 4, programmed : 25000, actual : 0
+Timer : 5, programmed : 30000, actual : 0
+Timer : 6, programmed : 35000, actual : 0
+Timer : 7, programmed : 40000, actual : 0
+Timer : 8, programmed : 45000, actual : 0
+Timer : 9, programmed : 50000, actual : 0
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+
+...
+
+
+SimpleTimer : 2, ms : 211269, Dms : 10064
+Timer : 0, programmed : 5000, actual : 5000            <========== Very accurate @ clock 16MHz
+Timer : 1, programmed : 10000, actual : 10000
+Timer : 2, programmed : 15000, actual : 15000
+Timer : 3, programmed : 20000, actual : 20000
+Timer : 4, programmed : 25000, actual : 25000
+Timer : 5, programmed : 30000, actual : 30000
+Timer : 6, programmed : 35000, actual : 35000
+Timer : 7, programmed : 40000, actual : 40000
+Timer : 8, programmed : 45000, actual : 45000
+Timer : 9, programmed : 50000, actual : 50000
+Timer : 10, programmed : 55000, actual : 55000
+Timer : 11, programmed : 60000, actual : 60000
+Timer : 12, programmed : 65000, actual : 65000
+Timer : 13, programmed : 70000, actual : 70000
+Timer : 14, programmed : 75000, actual : 75000
+Timer : 15, programmed : 80000, actual : 80000
+SimpleTimer : 2, ms : 221333, Dms : 10064
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 10000
+Timer : 2, programmed : 15000, actual : 15000
+Timer : 3, programmed : 20000, actual : 20000
+Timer : 4, programmed : 25000, actual : 25000
+Timer : 5, programmed : 30000, actual : 30000
+Timer : 6, programmed : 35000, actual : 35000
+Timer : 7, programmed : 40000, actual : 40000
+Timer : 8, programmed : 45000, actual : 45000
+Timer : 9, programmed : 50000, actual : 50000
+Timer : 10, programmed : 55000, actual : 55000
+Timer : 11, programmed : 60000, actual : 60000
+Timer : 12, programmed : 65000, actual : 65000
+Timer : 13, programmed : 70000, actual : 70000
+Timer : 14, programmed : 75000, actual : 75000
+Timer : 15, programmed : 80000, actual : 80000
+
+```
+
+---
+
+### 3.2. TCB Clock Frequency 8MHz for very high accuracy
+
+```
+
+Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
+megaAVR_TimerInterrupt v1.2.0
+CPU Frequency = 16 MHz
+TCB Clock Frequency = 8MHz for very high accuracy
+Starting  ITimer1 OK, millis() = 10
+SimpleTimer : 2, ms : 10011, Dms : 10011
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 10011
+Timer : 2, programmed : 15000, actual : 0
+Timer : 3, programmed : 20000, actual : 0
+Timer : 4, programmed : 25000, actual : 0
+Timer : 5, programmed : 30000, actual : 0
+Timer : 6, programmed : 35000, actual : 0
+Timer : 7, programmed : 40000, actual : 0
+Timer : 8, programmed : 45000, actual : 0
+Timer : 9, programmed : 50000, actual : 0
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+
+...
+
+
+SimpleTimer : 2, ms : 160949, Dms : 10064
+Timer : 0, programmed : 5000, actual : 5000            <========== Very accurate @ clock 8MHz
+Timer : 1, programmed : 10000, actual : 10000
+Timer : 2, programmed : 15000, actual : 15000
+Timer : 3, programmed : 20000, actual : 20000
+Timer : 4, programmed : 25000, actual : 25000
+Timer : 5, programmed : 30000, actual : 30000
+Timer : 6, programmed : 35000, actual : 35000
+Timer : 7, programmed : 40000, actual : 40000
+Timer : 8, programmed : 45000, actual : 45000
+Timer : 9, programmed : 50000, actual : 50000
+Timer : 10, programmed : 55000, actual : 55000
+Timer : 11, programmed : 60000, actual : 60000
+Timer : 12, programmed : 65000, actual : 65000
+Timer : 13, programmed : 70000, actual : 70000
+Timer : 14, programmed : 75000, actual : 75000
+Timer : 15, programmed : 80000, actual : 80000
+SimpleTimer : 2, ms : 171013, Dms : 10064
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 10000
+Timer : 2, programmed : 15000, actual : 15000
+Timer : 3, programmed : 20000, actual : 20000
+Timer : 4, programmed : 25000, actual : 25000
+Timer : 5, programmed : 30000, actual : 30000
+Timer : 6, programmed : 35000, actual : 35000
+Timer : 7, programmed : 40000, actual : 40000
+Timer : 8, programmed : 45000, actual : 45000
+Timer : 9, programmed : 50000, actual : 50000
+Timer : 10, programmed : 55000, actual : 55000
+Timer : 11, programmed : 60000, actual : 60000
+Timer : 12, programmed : 65000, actual : 65000
+Timer : 13, programmed : 70000, actual : 70000
+Timer : 14, programmed : 75000, actual : 75000
+Timer : 15, programmed : 80000, actual : 80000
+
+```
+
+---
+
+### 3.3. TCB Clock Frequency 250KHz for lower accuracy but longer time
+
+```
+Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
+megaAVR_TimerInterrupt v1.2.0
+CPU Frequency = 16 MHz
+TCB Clock Frequency = 250KHz for lower accuracy but longer time
+Starting  ITimer1 OK, millis() = 11
+SimpleTimer : 2, ms : 10012, Dms : 10012
+Timer : 0, programmed : 5000, actual : 5021
+Timer : 1, programmed : 10000, actual : 10015
+Timer : 2, programmed : 15000, actual : 0
+Timer : 3, programmed : 20000, actual : 0
+Timer : 4, programmed : 25000, actual : 0
+Timer : 5, programmed : 30000, actual : 0
+Timer : 6, programmed : 35000, actual : 0
+Timer : 7, programmed : 40000, actual : 0
+Timer : 8, programmed : 45000, actual : 0
+Timer : 9, programmed : 50000, actual : 0
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2, ms : 20071, Dms : 10059
+Timer : 0, programmed : 5000, actual : 4994
+Timer : 1, programmed : 10000, actual : 9999
+Timer : 2, programmed : 15000, actual : 15020
+Timer : 3, programmed : 20000, actual : 20014
+Timer : 4, programmed : 25000, actual : 0
+Timer : 5, programmed : 30000, actual : 0
+Timer : 6, programmed : 35000, actual : 0
+Timer : 7, programmed : 40000, actual : 0
+Timer : 8, programmed : 45000, actual : 0
+Timer : 9, programmed : 50000, actual : 0
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+
+...
+
+
+SimpleTimer : 2, ms : 845278, Dms : 10063
+Timer : 0, programmed : 5000, actual : 4994            <========== Less accurate @ clock 250KHz
+Timer : 1, programmed : 10000, actual : 9997
+Timer : 2, programmed : 15000, actual : 15001
+Timer : 3, programmed : 20000, actual : 20005
+Timer : 4, programmed : 25000, actual : 25000
+Timer : 5, programmed : 30000, actual : 30004
+Timer : 6, programmed : 35000, actual : 34998
+Timer : 7, programmed : 40000, actual : 40001
+Timer : 8, programmed : 45000, actual : 44995
+Timer : 9, programmed : 50000, actual : 50000
+Timer : 10, programmed : 55000, actual : 55004
+Timer : 11, programmed : 60000, actual : 59998
+Timer : 12, programmed : 65000, actual : 64992
+Timer : 13, programmed : 70000, actual : 70005
+Timer : 14, programmed : 75000, actual : 75000
+Timer : 15, programmed : 80000, actual : 80004
+SimpleTimer : 2, ms : 855342, Dms : 10064
+Timer : 0, programmed : 5000, actual : 5004
+Timer : 1, programmed : 10000, actual : 9999
+Timer : 2, programmed : 15000, actual : 15003
+Timer : 3, programmed : 20000, actual : 20005
+Timer : 4, programmed : 25000, actual : 25000
+Timer : 5, programmed : 30000, actual : 30004
+Timer : 6, programmed : 35000, actual : 34998
+Timer : 7, programmed : 40000, actual : 40001
+Timer : 8, programmed : 45000, actual : 45007
+Timer : 9, programmed : 50000, actual : 50000
+Timer : 10, programmed : 55000, actual : 55004
+Timer : 11, programmed : 60000, actual : 59998
+Timer : 12, programmed : 65000, actual : 64992
+Timer : 13, programmed : 70000, actual : 70005
+Timer : 14, programmed : 75000, actual : 75000
+Timer : 15, programmed : 80000, actual : 80004
+```
+
+
 
 ---
 ---
@@ -947,6 +1239,11 @@ Sometimes, the library will only work if you update the board core to the latest
 ---
 
 ## Releases
+
+### Release v1.2.0
+
+1. Selectable **TCB Clock 16MHz, 8MHz or 250KHz** depending on necessary accuracy
+2. Add BOARD_NAME definition
 
 ### Release v1.1.0
 
@@ -997,6 +1294,7 @@ Submit issues to: [megaAVR_TimerInterrupt issues](https://github.com/khoih-prog/
 5. Add more examples.
 6. Similar library for ESP32, ESP8266, SAMD21/SAMD51, nRF52, Mbed-OS Nano-33-BLE, STM32
 7. Add support to ATmega4809-based boards, such as **Arduino UNO WiFi Rev2, AVR_NANO_EVERY, etc.**
+8. Selectable **TCB Clock 16MHz, 8MHz or 250KHz** depending on necessary accuracy
 
 ---
 ---
