@@ -11,15 +11,6 @@
   The accuracy is nearly perfect compared to software timers. The most important feature is they're ISR-based timers
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
-
-  Version: 1.3.0
-
-  Version Modified By   Date      Comments
-  ------- -----------  ---------- -----------
-  1.0.0   K.Hoang      01/04/2021 Initial coding to support Arduino megaAVR ATmega4809-based boards (UNO WiFi Rev2, etc.)
-  1.1.0   K.Hoang      14/04/2021 Fix bug. Don't use v1.0.0
-  1.2.0   K.Hoang      17/04/2021 Selectable TCB Clock 16MHz, 8MHz or 250KHz depending on necessary accuracy
-  1.3.0   K.Hoang      17/04/2021 Fix TCB Clock bug. Don't use v1.2.0
 *****************************************************************************************************************************/
 /*
    Notes:
@@ -31,14 +22,6 @@
    if the interrupt changes a multi-byte variable between a sequence of instructions, it can be read incorrectly.
    If your data is multiple variables, such as an array and a count, usually interrupts need to be disabled
    or the entire sequence of your code which accesses the data.
-
-   This example will demonstrate the nearly perfect accuracy compared to software timers by printing the actual elapsed millisecs.
-   Being ISR-based timers, their executions are not blocked by bad-behaving functions / tasks, such as connecting to WiFi, Internet
-   and Blynk services. You can also have many (up to 16) timers to use.
-   This non-being-blocked important feature is absolutely necessary for mission-critical tasks.
-   You'll see blynkTimer is blocked while connecting to WiFi / Internet / Blynk, and elapsed time is very unaccurate
-   In this super simple example, you don't see much different after Blynk is connected, because of no competing task is
-   written
 */
   
 // These define's must be placed at the beginning before #include "megaAVR_TimerInterrupt.h"

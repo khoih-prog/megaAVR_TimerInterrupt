@@ -12,7 +12,7 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 1.3.0
+  Version: 1.4.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -20,6 +20,7 @@
   1.1.0   K.Hoang      14/04/2021 Fix bug. Don't use v1.0.0
   1.2.0   K.Hoang      17/04/2021 Selectable TCB Clock 16MHz, 8MHz or 250KHz depending on necessary accuracy
   1.3.0   K.Hoang      17/04/2021 Fix TCB Clock bug. Don't use v1.2.0
+  1.4.0   K.Hoang      19/11/2021 Fix TCB Clock bug in high frequencies
 ****************************************************************************************************************************/
 
 #pragma once
@@ -48,7 +49,7 @@
 #include "TimerInterrupt_Generic_Debug.h"
 
 #ifndef MEGA_AVR_TIMER_INTERRUPT_VERSION
-  #define MEGA_AVR_TIMER_INTERRUPT_VERSION       "megaAVR_TimerInterrupt v1.3.0"
+  #define MEGA_AVR_TIMER_INTERRUPT_VERSION       "megaAVR_TimerInterrupt v1.4.0"
 #endif
 
 #include <avr/interrupt.h>
@@ -58,7 +59,7 @@
 
 #define MAX_COUNT_16BIT           65535
 
-typedef void (*timer_callback)(void);
+typedef void (*timer_callback)();
 typedef void (*timer_callback_p)(void *);
 
 // Count only TCB0-TCB3
@@ -87,7 +88,7 @@ class TimerInterrupt
     void*           _callback;        // pointer to the callback function
     void*           _params;          // function parameter
 
-    void set_CCMP(void);
+    void set_CCMP();
 
   public:
 
@@ -184,7 +185,7 @@ class TimerInterrupt
 
     void detachInterrupt();
 
-    void disableTimer(void)
+    void disableTimer()
     {
       detachInterrupt();
     }
@@ -199,13 +200,13 @@ class TimerInterrupt
     }
 
     // Just stop clock source, still keep the count
-    void pauseTimer(void);
+    void pauseTimer();
 
     // Just reconnect clock source, continue from the current count
-    void resumeTimer(void);
+    void resumeTimer();
 
     // Just stop clock source, clear the count
-    void stopTimer(void)
+    void stopTimer()
     {
       detachInterrupt();
     }
@@ -248,36 +249,42 @@ class TimerInterrupt
     void adjust_CCMPValue() //__attribute__((always_inline))
     {
       noInterrupts();
+      
+      if (_CCMPValueRemaining < MAX_COUNT_16BIT)
+      {
+        set_CCMP();
+      }
+        
+      interrupts();  
 
       _CCMPValueRemaining -= min(MAX_COUNT_16BIT, _CCMPValueRemaining);
 
-      if (_CCMPValueRemaining == 0)
+      if (_CCMPValueRemaining <= 0)
       {
         // Reset value for next cycle
         _CCMPValueRemaining = _CCMPValue;
+      
         TISR_LOGDEBUG1(F("adjust_CCMPValue: reset _CCMPValueRemaining = "), _CCMPValue);
         _timerDone = true;
       }
       else
         _timerDone = false;
-
-      interrupts();
     };
 
     void reload_CCMPValue() //__attribute__((always_inline))
     {
       noInterrupts();
 
-      // Reset value for next cycle, have to deduct the value already loaded to CCMP register
-
-      _CCMPValueRemaining -= min(MAX_COUNT_16BIT, _CCMPValueRemaining);
-
+      // Reset value for next cycle, have to deduct the value already loaded to CCMP register 
+      _CCMPValueRemaining = _CCMPValue;
+      set_CCMP();
+      
       _timerDone = false;
 
       interrupts();
     };
 
-    bool checkTimerDone(void) //__attribute__((always_inline))
+    bool checkTimerDone() //__attribute__((always_inline))
     {
       return _timerDone;
     };
@@ -331,8 +338,11 @@ class TimerInterrupt
             
             ITimer0.callback();
             
-            // To reload _CCMPValueRemaining as well as _CCMP register to MAX_COUNT_16BIT
-            ITimer0.reload_CCMPValue();
+            if (ITimer0.get_CCMPValue() > MAX_COUNT_16BIT)            
+            {
+              // To reload _CCMPValueRemaining as well as _CCMP register to MAX_COUNT_16BIT
+              ITimer0.reload_CCMPValue();
+            }
             
             if (countLocal > 0)
               ITimer0.setCount(countLocal - 1);       
@@ -382,8 +392,11 @@ class TimerInterrupt
           
           ITimer1.callback();
           
-          // To reload _CCMPValueRemaining as well as _CCMP register to MAX_COUNT_16BIT if _CCMPValueRemaining > MAX_COUNT_16BIT
-          ITimer1.reload_CCMPValue();
+          if (ITimer1.get_CCMPValue() > MAX_COUNT_16BIT)
+          {
+            // To reload _CCMPValueRemaining as well as _CCMP register to MAX_COUNT_16BIT if _CCMPValueRemaining > MAX_COUNT_16BIT
+            ITimer1.reload_CCMPValue();
+          }
                
           if (countLocal > 0)                  
             ITimer1.setCount(countLocal - 1);
@@ -429,8 +442,12 @@ class TimerInterrupt
           TISR_LOGDEBUG3(("T2 callback, _CCMPValueRemaining ="), ITimer2.get_CCMPValueRemaining(), (", millis ="), millis());
            
           ITimer2.callback();
-          // To reload _CCMPValue
-          ITimer2.reload_CCMPValue();
+          
+          if (ITimer2.get_CCMPValue() > MAX_COUNT_16BIT)
+          {
+            // To reload _CCMPValueRemaining as well as _CCMP register to MAX_COUNT_16BIT if _CCMPValueRemaining > MAX_COUNT_16BIT
+            ITimer2.reload_CCMPValue();
+          }
 
           if (countLocal > 0)
            ITimer2.setCount(countLocal - 1);
@@ -478,9 +495,12 @@ class TimerInterrupt
             
             ITimer3.callback();
             
-            // To reload _CCMPValueRemaining as well as _CCMP register to MAX_COUNT_16BIT
-            ITimer3.reload_CCMPValue();
-            
+            if (ITimer3.get_CCMPValue() > MAX_COUNT_16BIT)
+            {
+              // To reload _CCMPValueRemaining as well as _CCMP register to MAX_COUNT_16BIT if _CCMPValueRemaining > MAX_COUNT_16BIT
+              ITimer3.reload_CCMPValue();
+            }
+                        
             if (countLocal > 0)
               ITimer3.setCount(countLocal - 1);     
           }

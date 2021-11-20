@@ -13,11 +13,7 @@
   * [Why using ISR-based Hardware Timer Interrupt is better](#why-using-isr-based-hardware-timer-interrupt-is-better)
   * [Important Notes about ISR](#important-notes-about-isr)
   * [Currently supported Boards](#currently-supported-boards)
-* [Changelog](#changelog)
-  * [Release v1.3.0](#release-v130)
-  * [Release v1.2.0](#release-v120)
-  * [Release v1.1.0](#release-v110)
-  * [Initial Release v1.0.0](#initial-release-v100)
+* [Changelog](changelog.md)
 * [Prerequisites](#prerequisites)
 * [Installation](#installation)
   * [Use Arduino Library Manager](#use-arduino-library-manager)
@@ -40,19 +36,16 @@
   * [  1. Argument_Complex](examples/Argument_Complex)
   * [  2. Argument_None](examples/Argument_None)
   * [  3. Argument_Simple](examples/Argument_Simple)
-  * [  4. **Change_Interval**](examples/Change_Interval).
-  * [  5. **FakeAnalogWrite**](examples/FakeAnalogWrite).
+  * [  4. Change_Interval](examples/Change_Interval)
+  * [  5. FakeAnalogWrite](examples/FakeAnalogWrite)
   * [  6. **ISR_16_Timers_Array_Complex**](examples/ISR_16_Timers_Array_Complex).
   * [  7. ISR_RPM_Measure](examples/ISR_RPM_Measure)
-  * [  8. ISR_Switch](examples/ISR_Switch)
-  * [  9. ISR_Timer_Complex](examples/ISR_Timer_Complex)
-  * [ 10. **ISR_Timers_Array_Simple**](examples/ISR_Timers_Array_Simple).
-  * [ 11. ISR_Timer_Switch](examples/ISR_Timer_Switch)
-  * [ 12. ISR_Timer_Switches](examples/ISR_Timer_Switches)
-  * [ 13. RPM_Measure](examples/RPM_Measure)
-  * [ 14. SwitchDebounce](examples/SwitchDebounce)
-  * [ 15. TimerDuration](examples/TimerDuration)
-  * [ 16. TimerInterruptTest](examples/TimerInterruptTest)
+  * [  8. **Change_Interval_HF**](examples/Change_Interval_HF)
+  * [  9. **ISR_Timers_Array_Simple**](examples/ISR_Timers_Array_Simple).
+  * [ 10. RPM_Measure](examples/RPM_Measure)
+  * [ 11. SwitchDebounce](examples/SwitchDebounce)
+  * [ 12. TimerDuration](examples/TimerDuration)
+  * [ 13. TimerInterruptTest](examples/TimerInterruptTest)
 * [Example ISR_16_Timers_Array_Complex](#example-isr_16_timers_array_complex)
 * [Debug Terminal Output Samples](#debug-terminal-output-samples)
   * [1. ISR_16_Timers_Array_Complex on Arduino megaAVR Nano Every](#1-isr_16_timers_array_complex-on-arduino-megaavr-nano-every)
@@ -63,7 +56,6 @@
     * [3.3 TCB Clock Frequency 250KHz for lower accuracy but longer time](#33-tcb-clock-frequency-250khz-for-lower-accuracy-but-longer-time)
 * [Debug](#debug)
 * [Troubleshooting](#troubleshooting)
-* [Releases](#releases)
 * [Issues](#issues)
 * [TO DO](#to-do)
 * [DONE](#done)
@@ -124,31 +116,6 @@ The catch is your function is now part of an ISR (Interrupt Service Routine), an
 
 - **Arduino UNO WiFi Rev2, AVR_NANO_EVERY, etc.**
 - ATmega4809-based boards.
-
----
----
-
-## Changelog
-
-### Release v1.3.0
-
-1. Fix TCB Clock bug. Don't use v1.2.0
-
-
-### Release v1.2.0
-
-1. Selectable **TCB Clock 16MHz, 8MHz or 250KHz** depending on necessary accuracy
-2. Add BOARD_NAME definition
-
-### Release v1.1.0
-
-1. Fix bug. Don't use v1.0.0
-
-### Initial Release v1.0.0
-
-1. Intial release to support to ATmega4809-based boards, such as **Arduino UNO WiFi Rev2, AVR_NANO_EVERY, etc.**
-2. New examples to support Blynk using [**WiFiNINA_Generic**](https://github.com/khoih-prog/WiFiNINA_Generic) and [**Blynk_WiFiNINA_WM**](https://github.com/khoih-prog/Blynk_WiFiNINA_WM) libraries.
-
 
 ---
 ---
@@ -429,19 +396,16 @@ void setup()
  1. [Argument_Complex](examples/Argument_Complex)
  2. [Argument_None](examples/Argument_None)
  3. [Argument_Simple](examples/Argument_Simple)
- 4. [**Change_Interval**](examples/Change_Interval).
- 5. [**FakeAnalogWrite**](examples/FakeAnalogWrite).
+ 4. [Change_Interval](examples/Change_Interval).
+ 5. [FakeAnalogWrite](examples/FakeAnalogWrite).
  6. [**ISR_16_Timers_Array_Complex**](examples/ISR_16_Timers_Array_Complex).
  7. [ISR_RPM_Measure](examples/ISR_RPM_Measure)
- 8. [ISR_Switch](examples/ISR_Switch)
- 9. [ISR_Timer_Complex](examples/ISR_Timer_Complex)
-10. [**ISR_Timers_Array_Simple**](examples/ISR_Timers_Array_Simple).
-11. [ISR_Timer_Switch](examples/ISR_Timer_Switch)
-12. [ISR_Timer_Switches](examples/ISR_Timer_Switches)
-13. [RPM_Measure](examples/RPM_Measure)
-14. [SwitchDebounce](examples/SwitchDebounce)
-15. [TimerDuration](examples/TimerDuration)
-16. [TimerInterruptTest](examples/TimerInterruptTest)
+ 8. [**Change_Interval_HF**](examples/Change_Interval_HF)
+ 9. [**ISR_Timers_Array_Simple**](examples/ISR_Timers_Array_Simple).
+10. [RPM_Measure](examples/RPM_Measure)
+11. [SwitchDebounce](examples/SwitchDebounce)
+12. [TimerDuration](examples/TimerDuration)
+13. [TimerInterruptTest](examples/TimerInterruptTest)
 
 ---
 
@@ -799,7 +763,7 @@ While software timer, **programmed for 2s, is activated after more than 10.000s 
 ```
 
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.3.0
+megaAVR_TimerInterrupt v1.4.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 250KHz for lower accuracy but longer time
 Starting  ITimer1 OK, millis() = 6
@@ -951,7 +915,7 @@ The following is the sample terminal output when running example [Change_Interva
 
 ```
 Starting Change_Interval on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.3.0
+megaAVR_TimerInterrupt v1.4.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 250KHz for lower accuracy but longer time
 Starting  ITimer1 OK, millis() = 1
@@ -980,7 +944,7 @@ Changing Interval, Timer1 = 100,  Timer2 = 200
 
 ```
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.3.0
+megaAVR_TimerInterrupt v1.4.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 16MHz for highest accuracy
 Starting  ITimer1 OK, millis() = 6
@@ -1066,7 +1030,7 @@ Timer : 15, programmed : 80000, actual : 80000
 ```
 
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.3.0
+megaAVR_TimerInterrupt v1.4.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 8MHz for very high accuracy
 Starting  ITimer1 OK, millis() = 10
@@ -1134,7 +1098,7 @@ Timer : 15, programmed : 80000, actual : 80000
 
 ```
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.3.0
+megaAVR_TimerInterrupt v1.4.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 250KHz for lower accuracy but longer time
 Starting  ITimer1 OK, millis() = 11
@@ -1212,6 +1176,40 @@ Timer : 14, programmed : 75000, actual : 75000
 Timer : 15, programmed : 80000, actual : 80004
 ```
 
+---
+
+### 4. Change_Interval_HF on Arduino megaAVR Nano Every
+
+The following is the sample terminal output when running example [Change_Interval_HF](examples/Change_Interval_HF) on **Arduino megaAVR Nano Every** to demonstrate how to change High Frequency Timer Interval on-the-fly
+
+```
+Starting Change_Interval_HF on megaAVR Nano Every
+megaAVR_TimerInterrupt v1.4.0
+CPU Frequency = 16 MHz
+TCB Clock Frequency = 16MHz for highest accuracy
+[TISR] TCB 1
+[TISR] ==================
+[TISR] Init, Timer = 1
+[TISR] CTRLB   = 0
+[TISR] CCMP    = 65535
+[TISR] INTCTRL = 0
+[TISR] CTRLA   = 1
+[TISR] ==================
+[TISR] Frequency = 10000.00 , CLK_TCB_FREQ = 16000000
+[TISR] setFrequency: _CCMPValueRemaining =  1600
+Starting ITimer1 OK, millis() = 12
+Frequency, Timer1 = 10000
+Time = 10001, Timer1Count = 99856
+Time = 20002, Timer1Count = 199807
+[TISR] Frequency = 5000.00 , CLK_TCB_FREQ = 16000000
+[TISR] setFrequency: _CCMPValueRemaining =  3200
+Changing Frequency, Timer1 = 5000
+Time = 30003, Timer1Count = 249792
+Time = 40004, Timer1Count = 299784
+[TISR] Frequency = 10000.00 , CLK_TCB_FREQ = 16000000
+[TISR] setFrequency: _CCMPValueRemaining =  1600
+Changing Frequency, Timer1 = 10000
+```
 
 
 ---
@@ -1240,44 +1238,6 @@ If you get compilation errors, more often than not, you may need to install a ne
 
 Sometimes, the library will only work if you update the board core to the latest version because I am using newly added functions.
 
-
----
----
-
-## Releases
-
-### Release v1.3.0
-
-1. Fix TCB Clock bug. Don't use v1.2.0
-
-### Release v1.2.0
-
-1. Selectable **TCB Clock 16MHz, 8MHz or 250KHz** depending on necessary accuracy
-2. Add BOARD_NAME definition
-
-### Release v1.1.0
-
-1. Fix bug. Don't use v1.0.0
-
-### Initial Release v1.0.0
-
-1. Intial release to support to ATmega4809-based boards, such as **Arduino UNO WiFi Rev2, AVR_NANO_EVERY, etc.**
-2. New examples to support Blynk using [**WiFiNINA_Generic**](https://github.com/khoih-prog/WiFiNINA_Generic) and [**Blynk_WiFiNINA_WM**](https://github.com/khoih-prog/Blynk_WiFiNINA_WM) libraries.
-
-The [**ISR_Timer_Complex**](examples/ISR_Timer_Complex) example will demonstrate the nearly perfect accuracy compared to software timers by printing the actual elapsed millisecs of each type of timers.
-Being ISR-based timers, their executions are not blocked by bad-behaving functions / tasks, such as connecting to WiFi, Internet and Blynk services. You can also have many `(up to 16)` timers to use.
-
-This non-being-blocked important feature is absolutely necessary for mission-critical tasks.
-
-You'll see blynkTimer Software is blocked while system is connecting to WiFi / Internet / Blynk, as well as by blocking task 
-in loop(), using delay() function as an example. The elapsed time then is very unaccurate
-
----
-
-### Currently supported Boards
-
-- **Arduino UNO WiFi Rev2, AVR_NANO_EVERY, etc.**
-- ATmega4809-based boards.
 
 ---
 ---
@@ -1314,11 +1274,12 @@ Submit issues to: [megaAVR_TimerInterrupt issues](https://github.com/khoih-prog/
 Many thanks for everyone for bug reporting, new feature suggesting, testing and contributing to the development of this library. Especially to these people who have directly or indirectly contributed to this [megaAVR_TimerInterrupt library](https://github.com/khoih-prog/megaAVR_TimerInterrupt)
 
 1. Thanks to good work of [Miguel Wisintainer](https://github.com/tcpipchip) for initiating, inspriring, working with, developing, debugging, testing and maintaining.
-
+2. Thanks to [Bill Wuttke](https://github.com/wcwuttke) to report the issue [Interrupt interval 2X requested interval #1](https://github.com/khoih-prog/megaAVR_TimerInterrupt/issues/1) leading to new release v1.4.0 to fix bug in using higher frequencies than 250Hz.
 
 <table>
   <tr>
     <td align="center"><a href="https://github.com/tcpipchip"><img src="https://github.com/tcpipchip.png" width="100px;" alt="tcpipchip"/><br/><sub><b>⭐️ Miguel Wisintainer</b></sub></a><br/></td>
+    <td align="center"><a href="https://github.com/wcwuttke"><img src="https://github.com/wcwuttke.png" width="100px;" alt="wcwuttke"/><br/><sub><b>Bill Wuttke</b></sub></a><br/></td>
   </tr> 
 </table>
 

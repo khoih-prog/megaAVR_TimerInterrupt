@@ -12,7 +12,7 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 1.3.0
+  Version: 1.4.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -20,6 +20,7 @@
   1.1.0   K.Hoang      14/04/2021 Fix bug. Don't use v1.0.0
   1.2.0   K.Hoang      17/04/2021 Selectable TCB Clock 16MHz, 8MHz or 250KHz depending on necessary accuracy
   1.3.0   K.Hoang      17/04/2021 Fix TCB Clock bug. Don't use v1.2.0
+  1.4.0   K.Hoang      19/11/2021 Fix TCB Clock bug in high frequencies
 ****************************************************************************************************************************/
 
 #include "megaAVR_TimerInterrupt.h"
@@ -133,18 +134,18 @@ void TimerInterrupt::set_CCMP()
   _CCMPValueToUse = min(MAX_COUNT_16BIT, _CCMPValueRemaining);
   _CCMPValueRemaining -= _CCMPValueToUse;
    
-  TimerTCB[_timer]->CCMP     = _CCMPValueToUse;    // Value to compare with.
+  TimerTCB[_timer]->CCMP    = _CCMPValueToUse;    // Value to compare with.
   
   TimerTCB[_timer]->INTCTRL = TCB_CAPT_bm; // Enable the interrupt
   
-  TISR_LOGINFO(F("=================="));
-  TISR_LOGINFO1(F("set_CCMP, Timer ="), _timer);
-  TISR_LOGINFO1(F("CTRLB   ="), TimerTCB[_timer]->CTRLB);
-  TISR_LOGINFO1(F("CCMP    ="), TimerTCB[_timer]->CCMP);
-  TISR_LOGINFO1(F("INTCTRL ="), TimerTCB[_timer]->INTCTRL);
-  TISR_LOGINFO1(F("CTRLA   ="), TimerTCB[_timer]->CTRLA);
   TISR_LOGDEBUG(F("=================="));
-
+  TISR_LOGDEBUG1(F("set_CCMP, Timer ="), _timer);
+  TISR_LOGDEBUG1(F("CTRLB   ="), TimerTCB[_timer]->CTRLB);
+  TISR_LOGDEBUG1(F("CCMP    ="), TimerTCB[_timer]->CCMP);
+  TISR_LOGDEBUG1(F("INTCTRL ="), TimerTCB[_timer]->INTCTRL);
+  TISR_LOGDEBUG1(F("CTRLA   ="), TimerTCB[_timer]->CTRLA);
+  TISR_LOGDEBUG(F("=================="));
+  
   // Flag _CCMPValue == 0 => end of long timer
   if (_CCMPValueRemaining == 0)
     _timerDone = true;
@@ -215,7 +216,7 @@ bool TimerInterrupt::setFrequency(float frequency, timer_callback_p callback, ui
   }
 }
 
-void TimerInterrupt::detachInterrupt(void)
+void TimerInterrupt::detachInterrupt()
 {
   noInterrupts();
      
@@ -251,15 +252,14 @@ void TimerInterrupt::reattachInterrupt(unsigned long duration)
 
 // Just stop clock source, still keep the count
 // To fix this.
-void TimerInterrupt::pauseTimer(void)
+void TimerInterrupt::pauseTimer()
 { 
   detachInterrupt();
 }
 
 // Just reconnect clock source, continue from the current count
-void TimerInterrupt::resumeTimer(void)
+void TimerInterrupt::resumeTimer()
 { 
   reattachInterrupt();
 }
-
 
