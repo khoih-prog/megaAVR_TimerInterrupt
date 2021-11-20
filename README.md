@@ -54,6 +54,7 @@
     * [3.1 TCB Clock Frequency 16MHz for highest accuracy](#31-tcb-clock-frequency-16mhz-for-highest-accuracy)
     * [3.2 TCB Clock Frequency 8MHz for very high accuracy](#32-tcb-clock-frequency-8mhz-for-very-high-accuracy)
     * [3.3 TCB Clock Frequency 250KHz for lower accuracy but longer time](#33-tcb-clock-frequency-250khz-for-lower-accuracy-but-longer-time)
+  * [4. Change_Interval on Arduino megaAVR Nano Every](#4-change_interval_HF-on-arduino-megaavr-nano-every)
 * [Debug](#debug)
 * [Troubleshooting](#troubleshooting)
 * [Issues](#issues)
