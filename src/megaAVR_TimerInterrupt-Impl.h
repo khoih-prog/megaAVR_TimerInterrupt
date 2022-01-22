@@ -12,7 +12,7 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 1.4.0
+  Version: 1.5.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -21,14 +21,13 @@
   1.2.0   K.Hoang      17/04/2021 Selectable TCB Clock 16MHz, 8MHz or 250KHz depending on necessary accuracy
   1.3.0   K.Hoang      17/04/2021 Fix TCB Clock bug. Don't use v1.2.0
   1.4.0   K.Hoang      19/11/2021 Fix TCB Clock bug in high frequencies
+  1.5.0   K.Hoang      22/01/2022 Fix `multiple-definitions` linker error
 ****************************************************************************************************************************/
 
 #pragma once
 
 #ifndef MEGA_AVR_TIMERINTERRUPT_IMPL_H
 #define MEGA_AVR_TIMERINTERRUPT_IMPL_H
-
-//#include "megaAVR_TimerInterrupt.h"
 
 #ifndef TIMER_INTERRUPT_DEBUG
   #define TIMER_INTERRUPT_DEBUG      0
@@ -97,7 +96,7 @@ TCB_t* TimerTCB[ NUM_HW_TIMERS ] = { &TCB0, &TCB1, &TCB2, &TCB3 };
 
 #define CLK_TCB_FREQ          ( F_CPU / CLOCK_PRESCALER )
 
-void TimerInterrupt::init(int8_t timer)
+void TimerInterrupt::init(const int8_t& timer)
 {    
   // Set timer specific stuff
   // All timers in CTC mode
@@ -115,11 +114,11 @@ void TimerInterrupt::init(int8_t timer)
   TISR_LOGWARN1(F("TCB"), timer);
   
   TISR_LOGINFO(F("=================="));
-  TISR_LOGINFO1(F("Init, Timer ="), timer);
-  TISR_LOGINFO1(F("CTRLB   ="), TimerTCB[timer]->CTRLB);
-  TISR_LOGINFO1(F("CCMP    ="), TimerTCB[timer]->CCMP);
-  TISR_LOGINFO1(F("INTCTRL ="), TimerTCB[timer]->INTCTRL);
-  TISR_LOGINFO1(F("CTRLA   ="), TimerTCB[timer]->CTRLA);
+  TISR_LOGINFO1(F("Init, Timer = "), timer);
+  TISR_LOGINFO1(F("CTRLB   = "), TimerTCB[timer]->CTRLB);
+  TISR_LOGINFO1(F("CCMP    = "), TimerTCB[timer]->CCMP);
+  TISR_LOGINFO1(F("INTCTRL = "), TimerTCB[timer]->INTCTRL);
+  TISR_LOGINFO1(F("CTRLA   = "), TimerTCB[timer]->CTRLA);
   TISR_LOGINFO(F("=================="));
    
   _timer = timer;
@@ -144,11 +143,11 @@ void TimerInterrupt::set_CCMP()
   TimerTCB[_timer]->INTCTRL = TCB_CAPT_bm; // Enable the interrupt
   
   TISR_LOGDEBUG(F("=================="));
-  TISR_LOGDEBUG1(F("set_CCMP, Timer ="), _timer);
-  TISR_LOGDEBUG1(F("CTRLB   ="), TimerTCB[_timer]->CTRLB);
-  TISR_LOGDEBUG1(F("CCMP    ="), TimerTCB[_timer]->CCMP);
-  TISR_LOGDEBUG1(F("INTCTRL ="), TimerTCB[_timer]->INTCTRL);
-  TISR_LOGDEBUG1(F("CTRLA   ="), TimerTCB[_timer]->CTRLA);
+  TISR_LOGDEBUG1(F("set_CCMP, Timer = "), _timer);
+  TISR_LOGDEBUG1(F("CTRLB   = "), TimerTCB[_timer]->CTRLB);
+  TISR_LOGDEBUG1(F("CCMP    = "), TimerTCB[_timer]->CCMP);
+  TISR_LOGDEBUG1(F("INTCTRL = "), TimerTCB[_timer]->INTCTRL);
+  TISR_LOGDEBUG1(F("CTRLA   = "), TimerTCB[_timer]->CTRLA);
   TISR_LOGDEBUG(F("=================="));
   
   // Flag _CCMPValue == 0 => end of long timer
@@ -159,10 +158,8 @@ void TimerInterrupt::set_CCMP()
 
 // frequency (in hertz) and duration (in milliseconds).
 // Return true if frequency is OK with selected timer (CCMPValue is in range)
-bool TimerInterrupt::setFrequency(float frequency, timer_callback_p callback, uint32_t params, unsigned long duration)
-{
-  bool isSuccess = false;
-  
+bool TimerInterrupt::setFrequency(const float& frequency, timer_callback_p callback, const uint32_t& params, const unsigned long& duration)
+{ 
   //frequencyLimit must > 1
   float frequencyLimit = frequency * 17179.840;
 
@@ -180,8 +177,8 @@ bool TimerInterrupt::setFrequency(float frequency, timer_callback_p callback, ui
     {   
       _toggle_count = frequency * duration / 1000;
 
-      TISR_LOGINFO1(F("setFrequency => _toggle_count ="), _toggle_count);
-      TISR_LOGINFO3(F("Frequency ="), frequency, F(", duration ="), duration);
+      TISR_LOGINFO1(F("setFrequency => _toggle_count = "), _toggle_count);
+      TISR_LOGINFO3(F("Frequency ="), frequency, F(", duration = "), duration);
            
       if (_toggle_count < 1)
       {
@@ -207,7 +204,7 @@ bool TimerInterrupt::setFrequency(float frequency, timer_callback_p callback, ui
     
     _CCMPValue = _CCMPValueRemaining = (uint32_t) (CLK_TCB_FREQ / frequency);
 
-    TISR_LOGINFO3(F("Frequency ="), frequency, F(", CLK_TCB_FREQ ="), CLK_TCB_FREQ);
+    TISR_LOGINFO3(F("Frequency = "), frequency, F(", CLK_TCB_FREQ = "), CLK_TCB_FREQ);
     TISR_LOGINFO1(F("setFrequency: _CCMPValueRemaining = "), _CCMPValueRemaining);
                 
     // Set the CCMP for the given timer,
@@ -234,7 +231,7 @@ void TimerInterrupt::detachInterrupt()
 }
 
 // Duration (in milliseconds). Duration = 0 or not specified => run indefinitely
-void TimerInterrupt::reattachInterrupt(unsigned long duration)
+void TimerInterrupt::reattachInterrupt(const unsigned long& duration)
 {
   noInterrupts();
 
@@ -267,5 +264,241 @@ void TimerInterrupt::resumeTimer()
 { 
   reattachInterrupt();
 }
+
+////////////////////////////////////////////////////////
+
+// To be sure not used Timers are disabled
+
+// TCB0
+#if !defined(USE_TIMER_0)
+  #define USE_TIMER_0     false
+#endif
+
+// TCB1
+#if !defined(USE_TIMER_1)
+  #define USE_TIMER_1     false
+#endif
+
+// TCB2
+#if !defined(USE_TIMER_2)
+  #define USE_TIMER_2     false
+#endif
+
+// TCB3
+#if !defined(USE_TIMER_3)
+  #define USE_TIMER_3     false
+#endif
+
+
+//////////////////////////////////////////////
+
+#if USE_TIMER_0
+  #ifndef TIMER0_INSTANTIATED
+    // To force pre-instatiate only once
+    #define TIMER0_INSTANTIATED
+    TimerInterrupt ITimer0(HW_TIMER_0);
+    
+    ISR(TCB0_INT_vect)
+    {
+      long countLocal = ITimer0.getCount();
+              
+      if (ITimer0.getTimer() == 0)
+      {
+        if (countLocal != 0)
+        {
+          if (ITimer0.checkTimerDone())
+          {  
+            TISR_LOGDEBUG3(("T0 callback, _CCMPValueRemaining = "), ITimer0.get_CCMPValueRemaining(), (", millis = "), millis());
+            
+            ITimer0.callback();
+            
+            if (ITimer0.get_CCMPValue() > MAX_COUNT_16BIT)            
+            {
+              // To reload _CCMPValueRemaining as well as _CCMP register to MAX_COUNT_16BIT
+              ITimer0.reload_CCMPValue();
+            }
+            
+            if (countLocal > 0)
+              ITimer0.setCount(countLocal - 1);       
+          }
+          else
+          {
+            //Deduct _CCMPValue by min(MAX_COUNT_16BIT, _CCMPValue)
+            // If _CCMPValue == 0, flag _timerDone for next cycle     
+            // If last one (_CCMPValueRemaining < MAX_COUNT_16BIT) => load _CCMP register _CCMPValueRemaining
+            ITimer0.adjust_CCMPValue();
+          }
+        }
+        else
+        {
+          TISR_LOGWARN(("T0 done"));
+          
+          ITimer0.detachInterrupt();
+        }
+      }
+      
+      // Clear interrupt flag
+      TCB0.INTFLAGS = TCB_CAPT_bm;
+    }
+  #endif  //#ifndef TIMER0_INSTANTIATED
+#endif    //#if USE_TIMER_0
+
+#if USE_TIMER_1 
+#ifndef TIMER1_INSTANTIATED
+  // To force pre-instatiate only once
+  #define TIMER1_INSTANTIATED
+  TimerInterrupt ITimer1(HW_TIMER_1);
+  
+  // Timer0 is used for micros(), millis(), delay(), etc and can't be used
+  // Pre-instatiate
+
+  ISR(TCB1_INT_vect)
+  {
+    long countLocal = ITimer1.getCount();
+         
+    if (ITimer1.getTimer() == 1)
+    {
+      if (countLocal != 0)
+      {
+        if (ITimer1.checkTimerDone())
+        {
+          TISR_LOGDEBUG3(("T1 callback, _CCMPValueRemaining = "), ITimer1.get_CCMPValueRemaining(), (", millis = "), millis());
+          
+          ITimer1.callback();
+          
+          if (ITimer1.get_CCMPValue() > MAX_COUNT_16BIT)
+          {
+            // To reload _CCMPValueRemaining as well as _CCMP register to MAX_COUNT_16BIT if _CCMPValueRemaining > MAX_COUNT_16BIT
+            ITimer1.reload_CCMPValue();
+          }
+               
+          if (countLocal > 0)                  
+            ITimer1.setCount(countLocal - 1);
+        }
+        else
+        {
+          //Deduct _CCMPValue by min(MAX_COUNT_16BIT, _CCMPValue)
+          // If _CCMPValue == 0, flag _timerDone for next cycle  
+          // If last one (_CCMPValueRemaining < MAX_COUNT_16BIT) => load _CCMP register _CCMPValueRemaining
+          ITimer1.adjust_CCMPValue();
+        }         
+      }
+      else
+      {
+        TISR_LOGWARN(("T1 done"));
+        
+        ITimer1.detachInterrupt();
+      }
+    }
+    
+    // Clear interrupt flag
+    TCB1.INTFLAGS = TCB_CAPT_bm;
+  }
+  
+#endif  //#ifndef TIMER1_INSTANTIATED
+#endif    //#if USE_TIMER_1
+
+#if USE_TIMER_2
+#ifndef TIMER2_INSTANTIATED
+  #define TIMER2_INSTANTIATED
+  TimerInterrupt ITimer2(HW_TIMER_2);
+  
+  ISR(TCB2_INT_vect)
+  {
+    long countLocal = ITimer2.getCount();
+   
+    if (ITimer2.getTimer() == 2)
+    {
+      if (countLocal != 0)
+      {
+        if (ITimer2.checkTimerDone())
+        {
+          TISR_LOGDEBUG3(("T2 callback, _CCMPValueRemaining = "), ITimer2.get_CCMPValueRemaining(), (", millis = "), millis());
+           
+          ITimer2.callback();
+          
+          if (ITimer2.get_CCMPValue() > MAX_COUNT_16BIT)
+          {
+            // To reload _CCMPValueRemaining as well as _CCMP register to MAX_COUNT_16BIT if _CCMPValueRemaining > MAX_COUNT_16BIT
+            ITimer2.reload_CCMPValue();
+          }
+
+          if (countLocal > 0)
+           ITimer2.setCount(countLocal - 1);
+
+        }
+        else
+        {           
+          //Deduct _CCMPValue by min(MAX_COUNT_8BIT, _CCMPValue)
+          // If _CCMPValue == 0, flag _timerDone for next cycle
+          ITimer2.adjust_CCMPValue();
+        }          
+      }    
+      else
+      {
+        TISR_LOGWARN(("T2 done"));
+        
+        ITimer2.detachInterrupt();
+      }
+    }
+    
+    // Clear interrupt flag
+    TCB2.INTFLAGS = TCB_CAPT_bm;
+  }    
+#endif  //#ifndef TIMER2_INSTANTIATED
+#endif    //#if USE_TIMER_2
+
+// Pre-instatiate
+#if USE_TIMER_3
+  #ifndef TIMER3_INSTANTIATED
+    // To force pre-instatiate only once
+    #define TIMER3_INSTANTIATED
+    TimerInterrupt ITimer3(HW_TIMER_3);
+    
+    ISR(TCB3_INT_vect)
+    {
+      long countLocal = ITimer3.getCount();
+      
+      if (ITimer3.getTimer() == 3)
+      {
+        if (countLocal != 0)
+        {
+          if (ITimer3.checkTimerDone())
+          { 
+            TISR_LOGDEBUG3(("T3 callback, _CCMPValueRemaining = "), ITimer3.get_CCMPValueRemaining(), (", millis = "), millis());
+            
+            ITimer3.callback();
+            
+            if (ITimer3.get_CCMPValue() > MAX_COUNT_16BIT)
+            {
+              // To reload _CCMPValueRemaining as well as _CCMP register to MAX_COUNT_16BIT if _CCMPValueRemaining > MAX_COUNT_16BIT
+              ITimer3.reload_CCMPValue();
+            }
+                        
+            if (countLocal > 0)
+              ITimer3.setCount(countLocal - 1);     
+          }
+          else
+          {
+            //Deduct _CCMPValue by min(MAX_COUNT_16BIT, _CCMPValue)
+            // If _CCMPValue == 0, flag _timerDone for next cycle          
+            // If last one (_CCMPValueRemaining < MAX_COUNT_16BIT) => load _CCMP register _CCMPValueRemaining
+            ITimer3.adjust_CCMPValue();
+          }
+        }
+        else
+        {
+          TISR_LOGWARN(("T3 done"));
+          
+          ITimer3.detachInterrupt();
+        }
+      }
+      
+      // Clear interrupt flag
+      TCB3.INTFLAGS = TCB_CAPT_bm;
+    }  
+    
+  #endif  //#ifndef TIMER3_INSTANTIATED
+#endif    //#if USE_TIMER_3
 
 #endif // MEGA_AVR_TIMERINTERRUPT_IMPL_H

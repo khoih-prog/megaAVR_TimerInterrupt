@@ -8,6 +8,7 @@
 
 ## Table of Contents
 
+* [Important Change from v1.5.0](#Important-Change-from-v150)
 * [Why do we need this megaAVR_TimerInterrupt library](#why-do-we-need-this-megaavr_timerinterrupt-library)
   * [Features](#features)
   * [Why using ISR-based Hardware Timer Interrupt is better](#why-using-isr-based-hardware-timer-interrupt-is-better)
@@ -46,6 +47,7 @@
   * [ 11. SwitchDebounce](examples/SwitchDebounce)
   * [ 12. TimerDuration](examples/TimerDuration)
   * [ 13. TimerInterruptTest](examples/TimerInterruptTest)
+  * [ 14. **multiFileProject**](examples/multiFileProject) **New**
 * [Example ISR_16_Timers_Array_Complex](#example-isr_16_timers_array_complex)
 * [Debug Terminal Output Samples](#debug-terminal-output-samples)
   * [1. ISR_16_Timers_Array_Complex on Arduino megaAVR Nano Every](#1-isr_16_timers_array_complex-on-arduino-megaavr-nano-every)
@@ -67,6 +69,10 @@
 
 ---
 ---
+
+### Important Change from v1.5.0
+
+Please have a look at [HOWTO Fix `Multiple Definitions` Linker Error](#howto-fix-multiple-definitions-linker-error)
 
 ### Why do we need this [megaAVR_TimerInterrupt library](https://github.com/khoih-prog/megaAVR_TimerInterrupt)
 
@@ -124,9 +130,11 @@ The catch is your function is now part of an ISR (Interrupt Service Routine), an
 
 ## Prerequisites
 
-1. [`Arduino IDE 1.8.13+` for Arduino](https://www.arduino.cc/en/Main/Software)
+1. [`Arduino IDE 1.8.19+` for Arduino](https://github.com/arduino/Arduino). [![GitHub release](https://img.shields.io/github/release/arduino/Arduino.svg)](https://github.com/arduino/Arduino/releases/latest)
 2. [`Arduino megaAVR core 1.8.7+`](https://github.com/arduino/ArduinoCore-megaavr/releases) for Arduino megaAVR boards. Use Arduino Board Manager to install.
-
+3. To use with certain example
+   - [`SimpleTimer library`](https://github.com/jfturcot/SimpleTimer) for [ISR_Timers_Array_Simple](examples/ISR_Timers_Array_Simple) and [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex) examples.
+   
 ---
 ---
 
@@ -158,24 +166,29 @@ Another way to install is to:
 
 ### HOWTO Fix `Multiple Definitions` Linker Error
 
-The current library implementation, using **xyz-Impl.h instead of standard xyz.cpp**, possibly creates certain `Multiple Definitions` Linker error in certain use cases. Although it's simple to just modify several lines of code, either in the library or in the application, the library is adding 2 more source directories
+The current library implementation, using `xyz-Impl.h` instead of standard `xyz.cpp`, possibly creates certain `Multiple Definitions` Linker error in certain use cases.
 
-1. **scr_h** for new h-only files
-2. **src_cpp** for standard h/cpp files
+You can include these `.hpp` files
 
-besides the standard **src** directory.
+```
+// Can be included as many times as necessary, without `Multiple Definitions` Linker Error
+#include "megaAVR_TimerInterrupt.hpp"   //https://github.com/khoih-prog/megaAVR_TimerInterrupt
 
-To use the **old standard cpp** way, locate this library' directory, then just 
+// Can be included as many times as necessary, without `Multiple Definitions` Linker Error
+#include "megaAVR_ISR_Timer.hpp"        //https://github.com/khoih-prog/megaAVR_TimerInterrupt
+```
 
-1. **Delete the all the files in src directory.**
-2. **Copy all the files in src_cpp directory into src.**
-3. Close then reopen the application code in Arduino IDE, etc. to recompile from scratch.
+in many files. But be sure to use the following `.h` files **in just 1 `.h`, `.cpp` or `.ino` file**, which must **not be included in any other file**, to avoid `Multiple Definitions` Linker Error
 
-To re-use the **new h-only** way, just 
+```
+// To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
+#include "megaAVR_TimerInterrupt.h"     //https://github.com/khoih-prog/megaAVR_TimerInterrupt
 
-1. **Delete the all the files in src directory.**
-2. **Copy the files in src_h directory into src.**
-3. Close then reopen the application code in Arduino IDE, etc. to recompile from scratch.
+// To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
+#include "megaAVR_ISR_Timer.h"          //https://github.com/khoih-prog/megaAVR_TimerInterrupt
+```
+
+Check the new [**multiFileProject** example](examples/multiFileProject) for a `HOWTO` demo.
 
 ---
 ---
@@ -407,17 +420,22 @@ void setup()
 11. [SwitchDebounce](examples/SwitchDebounce)
 12. [TimerDuration](examples/TimerDuration)
 13. [TimerInterruptTest](examples/TimerInterruptTest)
+14. [**multiFileProject**](examples/multiFileProject) **New**
 
 ---
 
 ### Example [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex)
 
 ```cpp
+#if !( defined(__AVR_ATmega4809__) || defined(ARDUINO_AVR_UNO_WIFI_REV2) || defined(ARDUINO_AVR_NANO_EVERY) )
+  #error This is designed only for Arduino megaAVR board! Please check your Tools->Board setting.
+#endif
+
 // These define's must be placed at the beginning before #include "megaAVR_TimerInterrupt.h"
 // _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
 // Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
 #define TIMER_INTERRUPT_DEBUG         0
-#define _TIMERINTERRUPT_LOGLEVEL_     0
+#define _TIMERINTERRUPT_LOGLEVEL_     3
 
 // Select USING_16MHZ     == true for  16MHz to Timer TCBx => shorter timer, but better accuracy
 // Select USING_8MHZ      == true for   8MHz to Timer TCBx => shorter timer, but better accuracy
@@ -433,10 +451,13 @@ void setup()
 #define USE_TIMER_2     true
 #define USE_TIMER_3     false
 
+// To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
 #include "megaAVR_TimerInterrupt.h"
+
+// To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
 #include "megaAVR_ISR_Timer.h"
 
-#include <SimpleTimer.h>              // https://github.com/schinken/SimpleTimer
+#include <SimpleTimer.h>              // https://github.com/jfturcot/SimpleTimer
 
 #ifndef LED_BUILTIN
   #define LED_BUILTIN       13
@@ -762,9 +783,8 @@ The following is the sample terminal output when running example [ISR_16_Timers_
 While software timer, **programmed for 2s, is activated after more than 10.000s in loop().
 
 ```
-
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.4.0
+megaAVR_TimerInterrupt v1.5.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 250KHz for lower accuracy but longer time
 Starting  ITimer1 OK, millis() = 6
@@ -916,7 +936,7 @@ The following is the sample terminal output when running example [Change_Interva
 
 ```
 Starting Change_Interval on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.4.0
+megaAVR_TimerInterrupt v1.5.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 250KHz for lower accuracy but longer time
 Starting  ITimer1 OK, millis() = 1
@@ -945,7 +965,7 @@ Changing Interval, Timer1 = 100,  Timer2 = 200
 
 ```
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.4.0
+megaAVR_TimerInterrupt v1.5.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 16MHz for highest accuracy
 Starting  ITimer1 OK, millis() = 6
@@ -1031,7 +1051,7 @@ Timer : 15, programmed : 80000, actual : 80000
 ```
 
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.4.0
+megaAVR_TimerInterrupt v1.5.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 8MHz for very high accuracy
 Starting  ITimer1 OK, millis() = 10
@@ -1099,7 +1119,7 @@ Timer : 15, programmed : 80000, actual : 80000
 
 ```
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.4.0
+megaAVR_TimerInterrupt v1.5.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 250KHz for lower accuracy but longer time
 Starting  ITimer1 OK, millis() = 11
@@ -1185,7 +1205,7 @@ The following is the sample terminal output when running example [Change_Interva
 
 ```
 Starting Change_Interval_HF on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.4.0
+megaAVR_TimerInterrupt v1.5.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 16MHz for highest accuracy
 [TISR] TCB 1
@@ -1257,15 +1277,17 @@ Submit issues to: [megaAVR_TimerInterrupt issues](https://github.com/khoih-prog/
 
 ### DONE
 
-1. Longer Interval for timers.
-2. Reduce code size if use less timers. Eliminate compiler warnings.
-3. Now supporting complex object pointer-type argument.
-3. 16 hardware-initiated software-enabled timers while using only 1 hardware timer.
-4. Fix some bugs in v1.0.0
-5. Add more examples.
-6. Similar library for ESP32, ESP8266, SAMD21/SAMD51, nRF52, Mbed-OS Nano-33-BLE, STM32
-7. Add support to ATmega4809-based boards, such as **Arduino UNO WiFi Rev2, AVR_NANO_EVERY, etc.**
-8. Selectable **TCB Clock 16MHz, 8MHz or 250KHz** depending on necessary accuracy
+ 1. Longer Interval for timers.
+ 2. Reduce code size if use less timers. Eliminate compiler warnings.
+ 3. Now supporting complex object pointer-type argument.
+ 4. 16 hardware-initiated software-enabled timers while using only 1 hardware timer.
+ 5. Fix some bugs in v1.0.0
+ 6. Add more examples.
+ 7. Similar library for ESP32, ESP8266, SAMD21/SAMD51, nRF52, Mbed-OS Nano-33-BLE, STM32
+ 8. Add support to ATmega4809-based boards, such as **Arduino UNO WiFi Rev2, AVR_NANO_EVERY, etc.**
+ 9. Selectable **TCB Clock 16MHz, 8MHz or 250KHz** depending on necessary accuracy
+10. Fix `multiple-definitions` linker error
+11. Optimize library code by using `reference-passing` instead of `value-passing`
 
 ---
 ---

@@ -12,7 +12,7 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 1.4.0
+  Version: 1.5.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -21,6 +21,7 @@
   1.2.0   K.Hoang      17/04/2021 Selectable TCB Clock 16MHz, 8MHz or 250KHz depending on necessary accuracy
   1.3.0   K.Hoang      17/04/2021 Fix TCB Clock bug. Don't use v1.2.0
   1.4.0   K.Hoang      19/11/2021 Fix TCB Clock bug in high frequencies
+  1.5.0   K.Hoang      22/01/2022 Fix `multiple-definitions` linker error
 *****************************************************************************************************************************/
 
 #pragma once
@@ -28,12 +29,12 @@
 #ifndef MEGA_AVR_ISR_TIMER_IMPL_H
 #define MEGA_AVR_ISR_TIMER_IMPL_H
 
-//#include "megaAVR_ISR_Timer.h"
 #include <string.h>
 
 // Select time function:
 //static inline unsigned long elapsed() { return micros(); }
-static inline unsigned long elapsed() {
+static inline unsigned long elapsed() 
+{
   return millis();
 }
 
@@ -146,7 +147,8 @@ int ISR_Timer::findFirstFreeSlot()
 }
 
 
-int ISR_Timer::setupTimer(unsigned long d, void* f, void* p, bool h, unsigned n) {
+int ISR_Timer::setupTimer(const unsigned long& d, void* f, void* p, bool h, const unsigned& n) 
+{
   int freeTimer;
 
   if (numTimers < 0) 
@@ -180,37 +182,37 @@ int ISR_Timer::setupTimer(unsigned long d, void* f, void* p, bool h, unsigned n)
 }
 
 
-int ISR_Timer::setTimer(unsigned long d, timer_callback f, unsigned n) 
+int ISR_Timer::setTimer(const unsigned long& d, timer_callback f, const unsigned& n) 
 {
   return setupTimer(d, (void *)f, NULL, false, n);
 }
 
-int ISR_Timer::setTimer(unsigned long d, timer_callback_p f, void* p, unsigned n) 
+int ISR_Timer::setTimer(const unsigned long& d, timer_callback_p f, void* p, const unsigned& n) 
 {
   return setupTimer(d, (void *)f, p, true, n);
 }
 
-int ISR_Timer::setInterval(unsigned long d, timer_callback f) 
+int ISR_Timer::setInterval(const unsigned long& d, timer_callback f) 
 {
   return setupTimer(d, (void *)f, NULL, false, RUN_FOREVER);
 }
 
-int ISR_Timer::setInterval(unsigned long d, timer_callback_p f, void* p) 
+int ISR_Timer::setInterval(const unsigned long& d, timer_callback_p f, void* p) 
 {
   return setupTimer(d, (void *)f, p, true, RUN_FOREVER);
 }
 
-int ISR_Timer::setTimeout(unsigned long d, timer_callback f) 
+int ISR_Timer::setTimeout(const unsigned long& d, timer_callback f) 
 {
   return setupTimer(d, (void *)f, NULL, false, RUN_ONCE);
 }
 
-int ISR_Timer::setTimeout(unsigned long d, timer_callback_p f, void* p) 
+int ISR_Timer::setTimeout(const unsigned long& d, timer_callback_p f, void* p) 
 {
   return setupTimer(d, (void *)f, p, true, RUN_ONCE);
 }
 
-bool ISR_Timer::changeInterval(unsigned numTimer, unsigned long d) 
+bool ISR_Timer::changeInterval(const unsigned& numTimer, const unsigned long& d) 
 {
   if (numTimer >= MAX_TIMERS) 
   {
@@ -229,7 +231,7 @@ bool ISR_Timer::changeInterval(unsigned numTimer, unsigned long d)
   return false;
 }
 
-void ISR_Timer::deleteTimer(unsigned timerId) 
+void ISR_Timer::deleteTimer(const unsigned& timerId) 
 {
   if (timerId >= MAX_TIMERS) 
   {
@@ -256,7 +258,7 @@ void ISR_Timer::deleteTimer(unsigned timerId)
 
 
 // function contributed by code@rowansimms.com
-void ISR_Timer::restartTimer(unsigned numTimer) 
+void ISR_Timer::restartTimer(const unsigned& numTimer) 
 {
   if (numTimer >= MAX_TIMERS) 
   {
@@ -267,7 +269,7 @@ void ISR_Timer::restartTimer(unsigned numTimer)
 }
 
 
-bool ISR_Timer::isEnabled(unsigned numTimer) 
+bool ISR_Timer::isEnabled(const unsigned& numTimer) 
 {
   if (numTimer >= MAX_TIMERS) 
   {
@@ -278,7 +280,7 @@ bool ISR_Timer::isEnabled(unsigned numTimer)
 }
 
 
-void ISR_Timer::enable(unsigned numTimer) 
+void ISR_Timer::enable(const unsigned& numTimer) 
 {
   if (numTimer >= MAX_TIMERS) 
   {
@@ -289,7 +291,7 @@ void ISR_Timer::enable(unsigned numTimer)
 }
 
 
-void ISR_Timer::disable(unsigned numTimer) 
+void ISR_Timer::disable(const unsigned& numTimer) 
 {
   if (numTimer >= MAX_TIMERS) 
   {
@@ -323,7 +325,7 @@ void ISR_Timer::disableAll()
   }
 }
 
-void ISR_Timer::toggle(unsigned numTimer) 
+void ISR_Timer::toggle(const unsigned& numTimer) 
 {
   if (numTimer >= MAX_TIMERS) 
   {

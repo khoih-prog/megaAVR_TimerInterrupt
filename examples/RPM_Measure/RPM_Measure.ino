@@ -23,6 +23,10 @@
    then use timer to count the time between active state
 */
 
+#if !( defined(__AVR_ATmega4809__) || defined(ARDUINO_AVR_UNO_WIFI_REV2) || defined(ARDUINO_AVR_NANO_EVERY) )
+  #error This is designed only for Arduino megaAVR board! Please check your Tools->Board setting.
+#endif
+
 // These define's must be placed at the beginning before #include "megaAVR_TimerInterrupt.h"
 // _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
 // Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
@@ -42,6 +46,7 @@
 #define USE_TIMER_2     true
 #define USE_TIMER_3     false
 
+// To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
 #include "megaAVR_TimerInterrupt.h"
 
 unsigned int SWPin = A0;
