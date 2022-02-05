@@ -12,7 +12,7 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 1.5.0
+  Version: 1.6.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -22,6 +22,7 @@
   1.3.0   K.Hoang      17/04/2021 Fix TCB Clock bug. Don't use v1.2.0
   1.4.0   K.Hoang      19/11/2021 Fix TCB Clock bug in high frequencies
   1.5.0   K.Hoang      22/01/2022 Fix `multiple-definitions` linker error
+  1.6.0   K.Hoang      05/02/2022 Add support to MegaCoreX core
 ****************************************************************************************************************************/
 
 #pragma once
@@ -65,8 +66,19 @@ typedef enum TCB_CNTMODE_enum
 
 *****************************************************************************************/
 
-
-TCB_t* TimerTCB[ NUM_HW_TIMERS ] = { &TCB0, &TCB1, &TCB2, &TCB3 };
+#if ( defined(__AVR_ATmega4809__) || defined(__AVR_ATmega3209__) || defined(__AVR_ATmega1609__) || defined(__AVR_ATmega809__) )
+  #warning Using __AVR_ATmegaXX09__ architecture
+  #define TIMER_INTERRUPT_USING_ATMEGA_XX09       true
+  
+  TCB_t* TimerTCB[ NUM_HW_TIMERS ] = { &TCB0, &TCB1, &TCB2, &TCB3 };
+  
+#elif ( defined(__AVR_ATmega4808__) || defined(__AVR_ATmega3208__) || defined(__AVR_ATmega1608__) || defined(__AVR_ATmega808__) )
+  #warning Using __AVR_ATmegaXX08__ architecture
+  #define TIMER_INTERRUPT_USING_ATMEGA_XX08       true
+  
+  TCB_t* TimerTCB[ NUM_HW_TIMERS ] = { &TCB0, &TCB1, &TCB2 };
+  
+#endif  
 
 #define CLK_TCA_FREQ      (250000L)
 

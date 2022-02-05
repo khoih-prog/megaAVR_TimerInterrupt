@@ -12,7 +12,7 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 1.5.0
+  Version: 1.6.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -22,6 +22,7 @@
   1.3.0   K.Hoang      17/04/2021 Fix TCB Clock bug. Don't use v1.2.0
   1.4.0   K.Hoang      19/11/2021 Fix TCB Clock bug in high frequencies
   1.5.0   K.Hoang      22/01/2022 Fix `multiple-definitions` linker error
+  1.6.0   K.Hoang      05/02/2022 Add support to MegaCoreX core
 ****************************************************************************************************************************/
 
 #pragma once
@@ -29,18 +30,41 @@
 #ifndef MEGA_AVR_TIMERINTERRUPT_HPP
 #define MEGA_AVR_TIMERINTERRUPT_HPP
 
-#if ( defined(__AVR_ATmega4809__) || defined(ARDUINO_AVR_UNO_WIFI_REV2) || defined(ARDUINO_AVR_NANO_EVERY) )
+#define TIMER_INTERRUPT_USING_ARDUINO_CORE        false
+
+#if ( defined(__AVR_ATmega4809__) || defined(ARDUINO_AVR_UNO_WIFI_REV2) || defined(ARDUINO_AVR_NANO_EVERY) || \
+      defined(ARDUINO_AVR_ATmega4809) || defined(ARDUINO_AVR_ATmega4808) || defined(ARDUINO_AVR_ATmega3209) || \
+      defined(ARDUINO_AVR_ATmega3208) || defined(ARDUINO_AVR_ATmega1609) || defined(ARDUINO_AVR_ATmega1608) || \
+      defined(ARDUINO_AVR_ATmega809) || defined(ARDUINO_AVR_ATmega808) )
   #if !defined(BOARD_NAME)
     #if (ARDUINO_AVR_UNO_WIFI_REV2)
       #define BOARD_NAME      "megaAVR UNO WiFi Rev2"
+      #define TIMER_INTERRUPT_USING_ARDUINO_CORE        true
     #elif (ARDUINO_AVR_NANO_EVERY)
       #define BOARD_NAME      "megaAVR Nano Every"
+      #define TIMER_INTERRUPT_USING_ARDUINO_CORE        true
+    #elif (ARDUINO_AVR_ATmega4809)
+      #define BOARD_NAME      "MegaCoreX ATmega4809"
+    #elif (ARDUINO_AVR_ATmega4808)
+      #define BOARD_NAME      "MegaCoreX ATmega4808"
+    #elif (ARDUINO_AVR_ATmega3209)
+      #define BOARD_NAME      "MegaCoreX ATmega3209"
+    #elif (ARDUINO_AVR_ATmega3208)
+      #define BOARD_NAME      "MegaCoreX ATmega3208"
+    #elif (ARDUINO_AVR_ATmega1609)
+      #define BOARD_NAME      "MegaCoreX ATmega1609"
+    #elif (ARDUINO_AVR_ATmega1608)
+      #define BOARD_NAME      "MegaCoreX ATmega1608"
+    #elif (ARDUINO_AVR_ATmega809)
+      #define BOARD_NAME      "MegaCoreX ATmega809"
+    #elif (ARDUINO_AVR_ATmega808)
+      #define BOARD_NAME      "MegaCoreX ATmega808"   
     #else
       #define BOARD_NAME      "megaAVR Unknown"
     #endif
   #endif
 #else
-  #error This is designed only for Arduino megaAVR board! Please check your Tools->Board setting.
+  #error This is designed only for Arduino or MegaCoreX megaAVR board! Please check your Tools->Board setting
 #endif
 
 #ifndef TIMER_INTERRUPT_DEBUG
@@ -50,13 +74,13 @@
 #include "TimerInterrupt_Generic_Debug.h"
 
 #ifndef MEGA_AVR_TIMER_INTERRUPT_VERSION
-  #define MEGA_AVR_TIMER_INTERRUPT_VERSION       "megaAVR_TimerInterrupt v1.5.0"
+  #define MEGA_AVR_TIMER_INTERRUPT_VERSION       "megaAVR_TimerInterrupt v1.6.0"
   
   #define MEGA_AVR_TIMER_INTERRUPT_VERSION_MAJOR      1
-  #define MEGA_AVR_TIMER_INTERRUPT_VERSION_MINOR      5
+  #define MEGA_AVR_TIMER_INTERRUPT_VERSION_MINOR      6
   #define MEGA_AVR_TIMER_INTERRUPT_VERSION_PATCH      0
 
-  #define MEGA_AVR_TIMER_INTERRUPT_VERSION_INT        1005000  
+  #define MEGA_AVR_TIMER_INTERRUPT_VERSION_INT        1006000  
 #endif
 
 #include <avr/interrupt.h>
@@ -64,7 +88,7 @@
 #include "Arduino.h"
 #include "pins_arduino.h"
 
-#define MAX_COUNT_16BIT           65535
+#define MAX_COUNT_16BIT           65535UL
 
 typedef void (*timer_callback)();
 typedef void (*timer_callback_p)(void *);
@@ -243,12 +267,12 @@ class TimerInterrupt
       //interrupts();
     };
 
-    long get_CCMPValue() __attribute__((always_inline))
+    uint32_t /*long*/ get_CCMPValue() __attribute__((always_inline))
     {
       return _CCMPValue;
     };
 
-    long get_CCMPValueRemaining() __attribute__((always_inline))
+    uint32_t /*long*/ get_CCMPValueRemaining() __attribute__((always_inline))
     {
       return _CCMPValueRemaining;
     };

@@ -13,8 +13,11 @@
   This important feature is absolutely necessary for mission-critical tasks.
  *****************************************************************************************************************************/
 
-#if !( defined(__AVR_ATmega4809__) || defined(ARDUINO_AVR_UNO_WIFI_REV2) || defined(ARDUINO_AVR_NANO_EVERY) )
-  #error This is designed only for Arduino megaAVR board! Please check your Tools->Board setting.
+#if !( defined(__AVR_ATmega4809__) || defined(ARDUINO_AVR_UNO_WIFI_REV2) || defined(ARDUINO_AVR_NANO_EVERY) || \
+      defined(ARDUINO_AVR_ATmega4809) || defined(ARDUINO_AVR_ATmega4808) || defined(ARDUINO_AVR_ATmega3209) || \
+      defined(ARDUINO_AVR_ATmega3208) || defined(ARDUINO_AVR_ATmega1609) || defined(ARDUINO_AVR_ATmega1608) || \
+      defined(ARDUINO_AVR_ATmega809) || defined(ARDUINO_AVR_ATmega808) )
+  #error This is designed only for Arduino or MegaCoreX megaAVR board! Please check your Tools->Board setting
 #endif
 
 // These define's must be placed at the beginning before #include "megaAVR_TimerInterrupt.h"
@@ -33,7 +36,13 @@
 
 #define USE_TIMER_0     false
 #define USE_TIMER_1     true
-#define USE_TIMER_2     true
+
+#if ( defined(ARDUINO_AVR_UNO_WIFI_REV2) || defined(ARDUINO_AVR_NANO_EVERY) )
+  #define USE_TIMER_2     true
+#else
+  #define USE_TIMER_2     false
+#endif
+
 #define USE_TIMER_3     false
 
 #include "megaAVR_TimerInterrupt.h"
@@ -62,7 +71,7 @@ void TimerHandler1(unsigned int outputPin = LED_BUILTIN)
   toggle1 = !toggle1;
 }
 
-#if !( TIMER_INTERRUPT_USING_ATMEGA_32U4 )
+#if ( defined(ARDUINO_AVR_UNO_WIFI_REV2) || defined(ARDUINO_AVR_NANO_EVERY) )
 
 void TimerHandler2(unsigned int outputPin = LED_BUILTIN)
 {
@@ -132,7 +141,7 @@ void setup()
   else
     Serial.println(F("Can't set ITimer1. Select another freq. or timer"));
 
-#if !( TIMER_INTERRUPT_USING_ATMEGA_32U4 )
+#if ( TIMER_INTERRUPT_USING_ARDUINO_CORE )
 
   ITimer2.init();
 

@@ -12,7 +12,7 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 1.5.0
+  Version: 1.6.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -22,6 +22,7 @@
   1.3.0   K.Hoang      17/04/2021 Fix TCB Clock bug. Don't use v1.2.0
   1.4.0   K.Hoang      19/11/2021 Fix TCB Clock bug in high frequencies
   1.5.0   K.Hoang      22/01/2022 Fix `multiple-definitions` linker error
+  1.6.0   K.Hoang      05/02/2022 Add support to MegaCoreX core
 ****************************************************************************************************************************/
 
 #pragma once

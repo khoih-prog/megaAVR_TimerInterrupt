@@ -6,6 +6,12 @@
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](#Contributing)
 [![GitHub issues](https://img.shields.io/github/issues/khoih-prog/megaAVR_TimerInterrupt.svg)](http://github.com/khoih-prog/megaAVR_TimerInterrupt/issues)
 
+<a href="https://www.buymeacoffee.com/khoihprog6" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
+
+---
+---
+
 ## Table of Contents
 
 * [Important Change from v1.5.0](#Important-Change-from-v150)
@@ -132,7 +138,8 @@ The catch is your function is now part of an ISR (Interrupt Service Routine), an
 
 1. [`Arduino IDE 1.8.19+` for Arduino](https://github.com/arduino/Arduino). [![GitHub release](https://img.shields.io/github/release/arduino/Arduino.svg)](https://github.com/arduino/Arduino/releases/latest)
 2. [`Arduino megaAVR core 1.8.7+`](https://github.com/arduino/ArduinoCore-megaavr/releases) for Arduino megaAVR boards. Use Arduino Board Manager to install.
-3. To use with certain example
+3. [`MegaCoreX megaAVR core 1.0.9+`](https://github.com/MCUdude/MegaCoreX/releases) for Arduino megaAVR boards.  [![GitHub release](https://img.shields.io/github/release/MCUdude/MegaCoreX.svg)](https://github.com/MCUdude/MegaCoreX/releases/latest). Follow [**How to install**](https://github.com/MCUdude/MegaCoreX#how-to-install).
+4. To use with certain example
    - [`SimpleTimer library`](https://github.com/jfturcot/SimpleTimer) for [ISR_Timers_Array_Simple](examples/ISR_Timers_Array_Simple) and [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex) examples.
    
 ---
@@ -427,8 +434,11 @@ void setup()
 ### Example [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex)
 
 ```cpp
-#if !( defined(__AVR_ATmega4809__) || defined(ARDUINO_AVR_UNO_WIFI_REV2) || defined(ARDUINO_AVR_NANO_EVERY) )
-  #error This is designed only for Arduino megaAVR board! Please check your Tools->Board setting.
+#if !( defined(__AVR_ATmega4809__) || defined(ARDUINO_AVR_UNO_WIFI_REV2) || defined(ARDUINO_AVR_NANO_EVERY) || \
+      defined(ARDUINO_AVR_ATmega4809) || defined(ARDUINO_AVR_ATmega4808) || defined(ARDUINO_AVR_ATmega3209) || \
+      defined(ARDUINO_AVR_ATmega3208) || defined(ARDUINO_AVR_ATmega1609) || defined(ARDUINO_AVR_ATmega1608) || \
+      defined(ARDUINO_AVR_ATmega809) || defined(ARDUINO_AVR_ATmega808) )
+  #error This is designed only for Arduino or MegaCoreX megaAVR board! Please check your Tools->Board setting
 #endif
 
 // These define's must be placed at the beginning before #include "megaAVR_TimerInterrupt.h"
@@ -448,7 +458,7 @@ void setup()
 
 #define USE_TIMER_0     false
 #define USE_TIMER_1     true
-#define USE_TIMER_2     true
+#define USE_TIMER_2     false
 #define USE_TIMER_3     false
 
 // To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
@@ -924,8 +934,6 @@ Timer : 12, programmed : 65000, actual : 65014
 Timer : 13, programmed : 70000, actual : 70008
 Timer : 14, programmed : 75000, actual : 75012
 Timer : 15, programmed : 80000, actual : 80016
-
-
 ```
 
 ---
@@ -1234,6 +1242,169 @@ Changing Frequency, Timer1 = 10000
 
 
 ---
+
+
+### 1. ISR_16_Timers_Array_Complex on Arduino megaAVR Nano Every using MegaCoreX
+
+The following is the sample terminal output when running example [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex) on **Arduino megaAVR Nano Every using MegaCoreX** to demonstrate the accuracy of ISR Hardware Timer, **especially when system is very busy**.  The ISR timer is **programmed for 2s, is activated exactly after 2.000s !!!**
+
+While software timer, **programmed for 2s, is activated after more than 10.000s in loop().
+
+```
+Starting ISR_16_Timers_Array_Complex on MegaCoreX ATmega4809
+megaAVR_TimerInterrupt v1.6.0
+CPU Frequency = 16 MHz
+TCB Clock Frequency = 16MHz for highest accuracy
+[TISR] TCB1
+[TISR] ==================
+[TISR] Init, Timer = 1
+[TISR] CTRLB   = 0
+[TISR] CCMP    = 65535
+[TISR] INTCTRL = 0
+[TISR] CTRLA   = 1
+[TISR] ==================
+[TISR] Frequency = 200.00, CLK_TCB_FREQ = 16000000
+[TISR] setFrequency: _CCMPValueRemaining = 80000
+Starting  ITimer1 OK, millis() = 12
+SimpleTimer : 2, ms : 10013, Dms : 10013
+Timer : 0, programmed : 5000, actual : 5016
+Timer : 1, programmed : 10000, actual : 10016
+Timer : 2, programmed : 15000, actual : 0
+Timer : 3, programmed : 20000, actual : 0
+Timer : 4, programmed : 25000, actual : 0
+Timer : 5, programmed : 30000, actual : 0
+Timer : 6, programmed : 35000, actual : 0
+Timer : 7, programmed : 40000, actual : 0
+Timer : 8, programmed : 45000, actual : 0
+Timer : 9, programmed : 50000, actual : 0
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2, ms : 20072, Dms : 10059
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 10000
+Timer : 2, programmed : 15000, actual : 15016
+Timer : 3, programmed : 20000, actual : 20016
+Timer : 4, programmed : 25000, actual : 0
+Timer : 5, programmed : 30000, actual : 0
+Timer : 6, programmed : 35000, actual : 0
+Timer : 7, programmed : 40000, actual : 0
+Timer : 8, programmed : 45000, actual : 0
+Timer : 9, programmed : 50000, actual : 0
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2, ms : 30132, Dms : 10060
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 10001
+Timer : 2, programmed : 15000, actual : 15001
+Timer : 3, programmed : 20000, actual : 20016
+Timer : 4, programmed : 25000, actual : 25017
+Timer : 5, programmed : 30000, actual : 30017
+Timer : 6, programmed : 35000, actual : 0
+Timer : 7, programmed : 40000, actual : 0
+Timer : 8, programmed : 45000, actual : 0
+Timer : 9, programmed : 50000, actual : 0
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2, ms : 40192, Dms : 10060
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 10000
+Timer : 2, programmed : 15000, actual : 15001
+Timer : 3, programmed : 20000, actual : 20001
+Timer : 4, programmed : 25000, actual : 25017
+Timer : 5, programmed : 30000, actual : 30017
+Timer : 6, programmed : 35000, actual : 35017
+Timer : 7, programmed : 40000, actual : 40017
+Timer : 8, programmed : 45000, actual : 0
+Timer : 9, programmed : 50000, actual : 0
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2, ms : 50253, Dms : 10061
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 10000
+Timer : 2, programmed : 15000, actual : 15000
+Timer : 3, programmed : 20000, actual : 20001
+Timer : 4, programmed : 25000, actual : 25000
+Timer : 5, programmed : 30000, actual : 30017
+Timer : 6, programmed : 35000, actual : 35017
+Timer : 7, programmed : 40000, actual : 40017
+Timer : 8, programmed : 45000, actual : 45017
+Timer : 9, programmed : 50000, actual : 50017
+Timer : 10, programmed : 55000, actual : 0
+Timer : 11, programmed : 60000, actual : 0
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2, ms : 60315, Dms : 10062
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 10000
+Timer : 2, programmed : 15000, actual : 15000
+Timer : 3, programmed : 20000, actual : 20000
+Timer : 4, programmed : 25000, actual : 25000
+Timer : 5, programmed : 30000, actual : 30000
+Timer : 6, programmed : 35000, actual : 35017
+Timer : 7, programmed : 40000, actual : 40017
+Timer : 8, programmed : 45000, actual : 45017
+Timer : 9, programmed : 50000, actual : 50017
+Timer : 10, programmed : 55000, actual : 55017
+Timer : 11, programmed : 60000, actual : 60017
+Timer : 12, programmed : 65000, actual : 0
+Timer : 13, programmed : 70000, actual : 0
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2, ms : 70377, Dms : 10062
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 9996
+Timer : 2, programmed : 15000, actual : 15000
+Timer : 3, programmed : 20000, actual : 20000
+Timer : 4, programmed : 25000, actual : 25000
+Timer : 5, programmed : 30000, actual : 30000
+Timer : 6, programmed : 35000, actual : 34996
+Timer : 7, programmed : 40000, actual : 40017
+Timer : 8, programmed : 45000, actual : 45017
+Timer : 9, programmed : 50000, actual : 50017
+Timer : 10, programmed : 55000, actual : 55017
+Timer : 11, programmed : 60000, actual : 60017
+Timer : 12, programmed : 65000, actual : 65013
+Timer : 13, programmed : 70000, actual : 70013
+Timer : 14, programmed : 75000, actual : 0
+Timer : 15, programmed : 80000, actual : 0
+SimpleTimer : 2, ms : 80440, Dms : 10063
+Timer : 0, programmed : 5000, actual : 5000
+Timer : 1, programmed : 10000, actual : 10000
+Timer : 2, programmed : 15000, actual : 14996
+Timer : 3, programmed : 20000, actual : 19996
+Timer : 4, programmed : 25000, actual : 24996
+Timer : 5, programmed : 30000, actual : 30000
+Timer : 6, programmed : 35000, actual : 34996
+Timer : 7, programmed : 40000, actual : 39996
+Timer : 8, programmed : 45000, actual : 45017
+Timer : 9, programmed : 50000, actual : 50017
+Timer : 10, programmed : 55000, actual : 55017
+Timer : 11, programmed : 60000, actual : 60017
+Timer : 12, programmed : 65000, actual : 65013
+Timer : 13, programmed : 70000, actual : 70013
+Timer : 14, programmed : 75000, actual : 75013
+Timer : 15, programmed : 80000, actual : 80013
+```
+
+---
 ---
 
 
@@ -1288,6 +1459,8 @@ Submit issues to: [megaAVR_TimerInterrupt issues](https://github.com/khoih-prog/
  9. Selectable **TCB Clock 16MHz, 8MHz or 250KHz** depending on necessary accuracy
 10. Fix `multiple-definitions` linker error
 11. Optimize library code by using `reference-passing` instead of `value-passing`
+12. Add support to `MegaCoreX` core, including ATmega4809, ATmega4808, ATmega3209, ATmega3208, ATmega1609, ATmega1608, ATmega809 and ATmega808
+
 
 ---
 ---

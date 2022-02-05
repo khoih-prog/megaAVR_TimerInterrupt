@@ -9,6 +9,7 @@
 ## Table of Contents
 
 * [Changelog](#changelog)
+  * [Release v1.6.0](#release-v160)
   * [Release v1.5.0](#release-v150)
   * [Release v1.4.0](#release-v140)
   * [Release v1.3.0](#release-v130)
@@ -20,6 +21,12 @@
 ---
 
 ## Changelog
+
+### Release v1.6.0
+
+1. Add support to `MegaCoreX` core, including ATmega4809, ATmega4808, ATmega3209, ATmega3208, ATmega1609, ATmega1608, ATmega809 and ATmega808
+2. Fix compiler warning
+3. Update all examples
 
 ### Release v1.5.0
 

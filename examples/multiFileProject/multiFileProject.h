@@ -27,7 +27,7 @@
 
 #define USE_TIMER_0     false
 #define USE_TIMER_1     true
-#define USE_TIMER_2     true
+#define USE_TIMER_2     false
 #define USE_TIMER_3     false
 
 // Can be included as many times as necessary, without `Multiple Definitions` Linker Error
