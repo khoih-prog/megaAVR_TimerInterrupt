@@ -63,6 +63,7 @@
     * [3.2 TCB Clock Frequency 8MHz for very high accuracy](#32-tcb-clock-frequency-8mhz-for-very-high-accuracy)
     * [3.3 TCB Clock Frequency 250KHz for lower accuracy but longer time](#33-tcb-clock-frequency-250khz-for-lower-accuracy-but-longer-time)
   * [4. Change_Interval on Arduino megaAVR Nano Every](#4-change_interval_HF-on-arduino-megaavr-nano-every)
+  * [5. ISR_16_Timers_Array_Complex on Arduino megaAVR Nano Every using MegaCoreX](#1-isr_16_timers_array_complex-on-arduino-megaavr-nano-every-using-MegaCoreX)
 * [Debug](#debug)
 * [Troubleshooting](#troubleshooting)
 * [Issues](#issues)
@@ -1244,7 +1245,7 @@ Changing Frequency, Timer1 = 10000
 ---
 
 
-### 1. ISR_16_Timers_Array_Complex on Arduino megaAVR Nano Every using MegaCoreX
+### 5. ISR_16_Timers_Array_Complex on Arduino megaAVR Nano Every using MegaCoreX
 
 The following is the sample terminal output when running example [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex) on **Arduino megaAVR Nano Every using MegaCoreX** to demonstrate the accuracy of ISR Hardware Timer, **especially when system is very busy**.  The ISR timer is **programmed for 2s, is activated exactly after 2.000s !!!**
 
