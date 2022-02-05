@@ -63,7 +63,7 @@
     * [3.2 TCB Clock Frequency 8MHz for very high accuracy](#32-tcb-clock-frequency-8mhz-for-very-high-accuracy)
     * [3.3 TCB Clock Frequency 250KHz for lower accuracy but longer time](#33-tcb-clock-frequency-250khz-for-lower-accuracy-but-longer-time)
   * [4. Change_Interval on Arduino megaAVR Nano Every](#4-change_interval_HF-on-arduino-megaavr-nano-every)
-  * [5. ISR_16_Timers_Array_Complex on Arduino megaAVR Nano Every using MegaCoreX](#1-isr_16_timers_array_complex-on-arduino-megaavr-nano-every-using-MegaCoreX)
+  * [5. ISR_16_Timers_Array_Complex on Arduino megaAVR Nano Every using MegaCoreX](#5-isr_16_timers_array_complex-on-arduino-megaavr-nano-every-using-MegaCoreX)
 * [Debug](#debug)
 * [Troubleshooting](#troubleshooting)
 * [Issues](#issues)
