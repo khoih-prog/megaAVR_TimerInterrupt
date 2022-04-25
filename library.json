@@ -1,6 +1,6 @@
 {
   "name": "megaAVR_TimerInterrupt",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "keywords": "timer, interrupt, isr, isr-based, timing, control, hardware-timer, mission-critical, accuracy, megaavr, nano-every, uno-wifi-rev2, atmega4809, atmega4808, atmega3209, atmega3208, atmega1609, atmega1608, atmega809, atmega808",
   "description": "This library enables you to use Interrupt from Hardware Timers on an Arduino megaAVR board, such as UNO WiFi Rev2, AVR_NANO_EVERY, etc. It now supports 16 ISR-based timers, while consuming only 1 hardware Timer. Timers' interval is very long (ulong millisecs). The most important feature is they're ISR-based timers. Therefore, their executions are not blocked by bad-behaving functions or tasks. This important feature is absolutely necessary for mission-critical tasks. Now supporting MegaCoreX.",
   "authors":
