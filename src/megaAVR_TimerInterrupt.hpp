@@ -12,7 +12,7 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 1.6.0
+  Version: 1.6.1
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -23,6 +23,7 @@
   1.4.0   K.Hoang      19/11/2021 Fix TCB Clock bug in high frequencies
   1.5.0   K.Hoang      22/01/2022 Fix `multiple-definitions` linker error
   1.6.0   K.Hoang      05/02/2022 Add support to MegaCoreX core
+  1.6.1   K.Hoang      25/04/2022 Suppress warnings when _TIMERINTERRUPT_LOGLEVEL_ < 2
 ****************************************************************************************************************************/
 
 #pragma once
@@ -30,7 +31,7 @@
 #ifndef MEGA_AVR_TIMERINTERRUPT_HPP
 #define MEGA_AVR_TIMERINTERRUPT_HPP
 
-#define TIMER_INTERRUPT_USING_ARDUINO_CORE        false
+//#define TIMER_INTERRUPT_USING_ARDUINO_CORE        false
 
 #if ( defined(__AVR_ATmega4809__) || defined(ARDUINO_AVR_UNO_WIFI_REV2) || defined(ARDUINO_AVR_NANO_EVERY) || \
       defined(ARDUINO_AVR_ATmega4809) || defined(ARDUINO_AVR_ATmega4808) || defined(ARDUINO_AVR_ATmega3209) || \
@@ -43,24 +44,28 @@
     #elif (ARDUINO_AVR_NANO_EVERY)
       #define BOARD_NAME      "megaAVR Nano Every"
       #define TIMER_INTERRUPT_USING_ARDUINO_CORE        true
-    #elif (ARDUINO_AVR_ATmega4809)
-      #define BOARD_NAME      "MegaCoreX ATmega4809"
-    #elif (ARDUINO_AVR_ATmega4808)
-      #define BOARD_NAME      "MegaCoreX ATmega4808"
-    #elif (ARDUINO_AVR_ATmega3209)
-      #define BOARD_NAME      "MegaCoreX ATmega3209"
-    #elif (ARDUINO_AVR_ATmega3208)
-      #define BOARD_NAME      "MegaCoreX ATmega3208"
-    #elif (ARDUINO_AVR_ATmega1609)
-      #define BOARD_NAME      "MegaCoreX ATmega1609"
-    #elif (ARDUINO_AVR_ATmega1608)
-      #define BOARD_NAME      "MegaCoreX ATmega1608"
-    #elif (ARDUINO_AVR_ATmega809)
-      #define BOARD_NAME      "MegaCoreX ATmega809"
-    #elif (ARDUINO_AVR_ATmega808)
-      #define BOARD_NAME      "MegaCoreX ATmega808"   
     #else
-      #define BOARD_NAME      "megaAVR Unknown"
+      #define TIMER_INTERRUPT_USING_ARDUINO_CORE        false 
+       
+		  #if (ARDUINO_AVR_ATmega4809)
+		    #define BOARD_NAME      "MegaCoreX ATmega4809"
+		  #elif (ARDUINO_AVR_ATmega4808)
+		    #define BOARD_NAME      "MegaCoreX ATmega4808"
+		  #elif (ARDUINO_AVR_ATmega3209)
+		    #define BOARD_NAME      "MegaCoreX ATmega3209"
+		  #elif (ARDUINO_AVR_ATmega3208)
+		    #define BOARD_NAME      "MegaCoreX ATmega3208"
+		  #elif (ARDUINO_AVR_ATmega1609)
+		    #define BOARD_NAME      "MegaCoreX ATmega1609"
+		  #elif (ARDUINO_AVR_ATmega1608)
+		    #define BOARD_NAME      "MegaCoreX ATmega1608"
+		  #elif (ARDUINO_AVR_ATmega809)
+		    #define BOARD_NAME      "MegaCoreX ATmega809"
+		  #elif (ARDUINO_AVR_ATmega808)
+		    #define BOARD_NAME      "MegaCoreX ATmega808"   
+		  #else
+		    #define BOARD_NAME      "megaAVR Unknown"
+		  #endif  
     #endif
   #endif
 #else
@@ -74,13 +79,13 @@
 #include "TimerInterrupt_Generic_Debug.h"
 
 #ifndef MEGA_AVR_TIMER_INTERRUPT_VERSION
-  #define MEGA_AVR_TIMER_INTERRUPT_VERSION       "megaAVR_TimerInterrupt v1.6.0"
+  #define MEGA_AVR_TIMER_INTERRUPT_VERSION       "megaAVR_TimerInterrupt v1.6.1"
   
   #define MEGA_AVR_TIMER_INTERRUPT_VERSION_MAJOR      1
   #define MEGA_AVR_TIMER_INTERRUPT_VERSION_MINOR      6
-  #define MEGA_AVR_TIMER_INTERRUPT_VERSION_PATCH      0
+  #define MEGA_AVR_TIMER_INTERRUPT_VERSION_PATCH      1
 
-  #define MEGA_AVR_TIMER_INTERRUPT_VERSION_INT        1006000  
+  #define MEGA_AVR_TIMER_INTERRUPT_VERSION_INT        1006001
 #endif
 
 #include <avr/interrupt.h>
@@ -110,7 +115,6 @@ class TimerInterrupt
 
     bool            _timerDone;
     int8_t          _timer;
-    unsigned int    _prescalerIndex;
     uint32_t        _CCMPValue;
     uint32_t        _CCMPValueRemaining;
     volatile long   _toggle_count;

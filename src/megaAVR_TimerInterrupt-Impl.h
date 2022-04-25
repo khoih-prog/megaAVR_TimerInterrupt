@@ -12,7 +12,7 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 1.6.0
+  Version: 1.6.1
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -23,6 +23,7 @@
   1.4.0   K.Hoang      19/11/2021 Fix TCB Clock bug in high frequencies
   1.5.0   K.Hoang      22/01/2022 Fix `multiple-definitions` linker error
   1.6.0   K.Hoang      05/02/2022 Add support to MegaCoreX core
+  1.6.1   K.Hoang      25/04/2022 Suppress warnings when _TIMERINTERRUPT_LOGLEVEL_ < 2
 ****************************************************************************************************************************/
 
 #pragma once
@@ -67,13 +68,19 @@ typedef enum TCB_CNTMODE_enum
 *****************************************************************************************/
 
 #if ( defined(__AVR_ATmega4809__) || defined(__AVR_ATmega3209__) || defined(__AVR_ATmega1609__) || defined(__AVR_ATmega809__) )
-  #warning Using __AVR_ATmegaXX09__ architecture
+  #if (_TIMERINTERRUPT_LOGLEVEL_ > 2)
+    #warning Using __AVR_ATmegaXX09__ architecture
+  #endif
+  
   #define TIMER_INTERRUPT_USING_ATMEGA_XX09       true
   
   TCB_t* TimerTCB[ NUM_HW_TIMERS ] = { &TCB0, &TCB1, &TCB2, &TCB3 };
   
 #elif ( defined(__AVR_ATmega4808__) || defined(__AVR_ATmega3208__) || defined(__AVR_ATmega1608__) || defined(__AVR_ATmega808__) )
-  #warning Using __AVR_ATmegaXX08__ architecture
+  #if (_TIMERINTERRUPT_LOGLEVEL_ > 2)
+    #warning Using __AVR_ATmegaXX08__ architecture
+  #endif
+  
   #define TIMER_INTERRUPT_USING_ATMEGA_XX08       true
   
   TCB_t* TimerTCB[ NUM_HW_TIMERS ] = { &TCB0, &TCB1, &TCB2 };
@@ -85,23 +92,31 @@ typedef enum TCB_CNTMODE_enum
 // Clock for UNO WiFi Rev2 and Nano Every is 16MHz
 #if USING_16MHZ  
   // Use no prescaler (prescaler 1) => 16MHz
-  #warning Using no prescaler => 16MHz
+  #if (_TIMERINTERRUPT_LOGLEVEL_ > 2)
+    #warning Using no prescaler => 16MHz
+  #endif
+  
   #define TCB_CLKSEL_VALUE      TCB_CLKSEL_CLKDIV1_gc
   #define CLOCK_PRESCALER       1
 #elif USING_8MHZ
   // Use prescaler 2 => 8MHz
-  #warning Using prescaler 2 => 8MHz
+  #if (_TIMERINTERRUPT_LOGLEVEL_ > 2)
+    #warning Using prescaler 2 => 8MHz
+  #endif
+  
   #define TCB_CLKSEL_VALUE      TCB_CLKSEL_CLKDIV2_gc
   #define CLOCK_PRESCALER       2
 #elif USING_250KHZ
   // Optional, but for clarity
   // Use Timer A as clock (prescaler 64) => 250KHz
-  #warning Using prescaler 64 => 250KHz
   #define TCB_CLKSEL_VALUE      TCB_CLKSEL_CLKTCA_gc 
   #define CLOCK_PRESCALER       64
 #else
   // Use Timer A as clock (prescaler 64) => 250KHz
-  #warning Using prescaler 64 => 250KHz
+  #if (_TIMERINTERRUPT_LOGLEVEL_ > 2)
+    #warning Using prescaler 64 => 250KHz
+  #endif
+  
   #define TCB_CLKSEL_VALUE      TCB_CLKSEL_CLKTCA_gc
   #define CLOCK_PRESCALER       64
 #endif

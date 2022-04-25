@@ -6,7 +6,8 @@
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](#Contributing)
 [![GitHub issues](https://img.shields.io/github/issues/khoih-prog/megaAVR_TimerInterrupt.svg)](http://github.com/khoih-prog/megaAVR_TimerInterrupt/issues)
 
-<a href="https://www.buymeacoffee.com/khoihprog6" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 50px !important;width: 181px !important;" ></a>
+<a href="https://www.buymeacoffee.com/khoihprog6" title="Donate to my libraries using BuyMeACoffee"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Donate to my libraries using BuyMeACoffee" style="height: 50px !important;width: 181px !important;" ></a>
+<a href="https://www.buymeacoffee.com/khoihprog6" title="Donate to my libraries using BuyMeACoffee"><img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-orange.svg?logo=buy-me-a-coffee&logoColor=FFDD00" style="height: 20px !important;width: 200px !important;" ></a>
 
 
 ---
@@ -139,7 +140,7 @@ The catch is your function is now part of an ISR (Interrupt Service Routine), an
 
 1. [`Arduino IDE 1.8.19+` for Arduino](https://github.com/arduino/Arduino). [![GitHub release](https://img.shields.io/github/release/arduino/Arduino.svg)](https://github.com/arduino/Arduino/releases/latest)
 2. [`Arduino megaAVR core 1.8.7+`](https://github.com/arduino/ArduinoCore-megaavr/releases) for Arduino megaAVR boards. Use Arduino Board Manager to install.
-3. [`MegaCoreX megaAVR core 1.0.9+`](https://github.com/MCUdude/MegaCoreX/releases) for Arduino megaAVR boards.  [![GitHub release](https://img.shields.io/github/release/MCUdude/MegaCoreX.svg)](https://github.com/MCUdude/MegaCoreX/releases/latest). Follow [**How to install**](https://github.com/MCUdude/MegaCoreX#how-to-install).
+3. [`MegaCoreX megaAVR core 1.0.10+`](https://github.com/MCUdude/MegaCoreX/releases) for Arduino megaAVR boards.  [![GitHub release](https://img.shields.io/github/release/MCUdude/MegaCoreX.svg)](https://github.com/MCUdude/MegaCoreX/releases/latest). Follow [**How to install**](https://github.com/MCUdude/MegaCoreX#how-to-install).
 4. To use with certain example
    - [`SimpleTimer library`](https://github.com/jfturcot/SimpleTimer) for [ISR_Timers_Array_Simple](examples/ISR_Timers_Array_Simple) and [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex) examples.
    
@@ -166,7 +167,7 @@ Another way to install is to:
 
 1. Install [VS Code](https://code.visualstudio.com/)
 2. Install [PlatformIO](https://platformio.org/platformio-ide)
-3. Install [**megaAVR_TimerInterrupt** library](https://platformio.org/lib/show/12025/megaAVR_TimerInterrupt) or [**megaAVR_TimerInterrupt** library](https://platformio.org/lib/show/12025/megaAVR_TimerInterrupt) by using [Library Manager](https://platformio.org/lib/show/xxxxx/megaAVR_TimerInterrupt/installation). Search for megaAVR_TimerInterrupt in [Platform.io Author's Libraries](https://platformio.org/lib/search?query=author:%22Khoi%20Hoang%22)
+3. Install [**megaAVR_TimerInterrupt** library](https://registry.platformio.org/libraries/khoih-prog/megaAVR_TimerInterrupt) by using [Library Manager](https://registry.platformio.org/libraries/khoih-prog/megaAVR_TimerInterrupt/installation). Search for megaAVR_TimerInterrupt in [Platform.io Author's Libraries](https://platformio.org/lib/search?query=author:%22Khoi%20Hoang%22)
 4. Use included [platformio.ini](platformio/platformio.ini) file from examples to ensure that all dependent libraries will installed automatically. Please visit documentation for the other options and examples at [Project Configuration File](https://docs.platformio.org/page/projectconf.html)
 
 ---
@@ -434,353 +435,8 @@ void setup()
 
 ### Example [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex)
 
-```cpp
-#if !( defined(__AVR_ATmega4809__) || defined(ARDUINO_AVR_UNO_WIFI_REV2) || defined(ARDUINO_AVR_NANO_EVERY) || \
-      defined(ARDUINO_AVR_ATmega4809) || defined(ARDUINO_AVR_ATmega4808) || defined(ARDUINO_AVR_ATmega3209) || \
-      defined(ARDUINO_AVR_ATmega3208) || defined(ARDUINO_AVR_ATmega1609) || defined(ARDUINO_AVR_ATmega1608) || \
-      defined(ARDUINO_AVR_ATmega809) || defined(ARDUINO_AVR_ATmega808) )
-  #error This is designed only for Arduino or MegaCoreX megaAVR board! Please check your Tools->Board setting
-#endif
+https://github.com/khoih-prog/megaAVR_TimerInterrupt/blob/97ef20cef96bbc9f8e9d22505605707f6fc72f5a/examples/ISR_16_Timers_Array_Complex/ISR_16_Timers_Array_Complex.ino#L16-L360
 
-// These define's must be placed at the beginning before #include "megaAVR_TimerInterrupt.h"
-// _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
-// Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
-#define TIMER_INTERRUPT_DEBUG         0
-#define _TIMERINTERRUPT_LOGLEVEL_     3
-
-// Select USING_16MHZ     == true for  16MHz to Timer TCBx => shorter timer, but better accuracy
-// Select USING_8MHZ      == true for   8MHz to Timer TCBx => shorter timer, but better accuracy
-// Select USING_250KHZ    == true for 250KHz to Timer TCBx => shorter timer, but better accuracy
-// Not select for default 250KHz to Timer TCBx => longer timer,  but worse accuracy
-#define USING_16MHZ     true
-#define USING_8MHZ      false
-#define USING_250KHZ    false
-
-
-#define USE_TIMER_0     false
-#define USE_TIMER_1     true
-#define USE_TIMER_2     false
-#define USE_TIMER_3     false
-
-// To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
-#include "megaAVR_TimerInterrupt.h"
-
-// To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
-#include "megaAVR_ISR_Timer.h"
-
-#include <SimpleTimer.h>              // https://github.com/jfturcot/SimpleTimer
-
-#ifndef LED_BUILTIN
-  #define LED_BUILTIN       13
-#endif
-
-ISR_Timer ISR_Timer1;
-
-#define LED_TOGGLE_INTERVAL_MS        1000L
-
-// You have to use longer time here if having problem because Arduino AVR clock is low, 16MHz => lower accuracy.
-// Tested OK with 1ms when not much load => higher accuracy.
-#define TIMER1_INTERVAL_MS            5L
-
-volatile uint32_t startMillis = 0;
-
-void TimerHandler1()
-{
-  static bool toggle  = false;
-  static int timeRun  = 0;
-
-  ISR_Timer1.run();
-
-  // Toggle LED every LED_TOGGLE_INTERVAL_MS = 2000ms = 2s
-  if (++timeRun == ((LED_TOGGLE_INTERVAL_MS) / TIMER1_INTERVAL_MS) )
-  {
-    timeRun = 0;
-
-    //timer interrupt toggles pin LED_BUILTIN
-    digitalWrite(LED_BUILTIN, toggle);
-    toggle = !toggle;
-  }
-}
-
-/////////////////////////////////////////////////
-
-#define NUMBER_ISR_TIMERS         16
-
-typedef void (*irqCallback)  (void);
-
-/////////////////////////////////////////////////
-
-#define USE_COMPLEX_STRUCT      true
-
-#if USE_COMPLEX_STRUCT
-
-  typedef struct 
-  {
-    irqCallback   irqCallbackFunc;
-    uint32_t      TimerInterval;
-    unsigned long deltaMillis;
-    unsigned long previousMillis;
-  } ISRTimerData;
-  
-  // In NRF52, avoid doing something fancy in ISR, for example Serial.print()
-  // The pure simple Serial.prints here are just for demonstration and testing. Must be eliminate in working environment
-  // Or you can get this run-time error / crash
-  
-  void doingSomething(int index);
-
-#else
-
-  volatile unsigned long deltaMillis    [NUMBER_ISR_TIMERS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  volatile unsigned long previousMillis [NUMBER_ISR_TIMERS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  
-  // You can assign any interval for any timer here, in milliseconds
-  uint32_t TimerInterval[NUMBER_ISR_TIMERS] =
-  {
-    5000L,  10000L,  15000L,  20000L,  25000L,  30000L,  35000L,  40000L,
-    45000L, 50000L,  55000L,  60000L,  65000L,  70000L,  75000L,  80000L
-  };
-  
-  void doingSomething(int index)
-  {
-    unsigned long currentMillis  = millis();
-    
-    deltaMillis[index]    = currentMillis - previousMillis[index];
-    previousMillis[index] = currentMillis;
-  }
-
-#endif
-
-////////////////////////////////////
-// Shared
-////////////////////////////////////
-
-void doingSomething0()
-{
-  doingSomething(0);
-}
-
-void doingSomething1()
-{
-  doingSomething(1);
-}
-
-void doingSomething2()
-{
-  doingSomething(2);
-}
-
-void doingSomething3()
-{
-  doingSomething(3);
-}
-
-void doingSomething4()
-{
-  doingSomething(4);
-}
-
-void doingSomething5()
-{
-  doingSomething(5);
-}
-
-void doingSomething6()
-{
-  doingSomething(6);
-}
-
-void doingSomething7()
-{
-  doingSomething(7);
-}
-
-void doingSomething8()
-{
-  doingSomething(8);
-}
-
-void doingSomething9()
-{
-  doingSomething(9);
-}
-
-void doingSomething10()
-{
-  doingSomething(10);
-}
-
-void doingSomething11()
-{
-  doingSomething(11);
-}
-
-void doingSomething12()
-{
-  doingSomething(12);
-}
-
-void doingSomething13()
-{
-  doingSomething(13);
-}
-
-void doingSomething14()
-{
-  doingSomething(14);
-}
-
-void doingSomething15()
-{
-  doingSomething(15);
-}
-
-#if USE_COMPLEX_STRUCT
-
-  ISRTimerData curISRTimerData[NUMBER_ISR_TIMERS] =
-  {
-    //irqCallbackFunc, TimerInterval, deltaMillis, previousMillis
-    { doingSomething0,    5000L, 0, 0 },
-    { doingSomething1,   10000L, 0, 0 },
-    { doingSomething2,   15000L, 0, 0 },
-    { doingSomething3,   20000L, 0, 0 },
-    { doingSomething4,   25000L, 0, 0 },
-    { doingSomething5,   30000L, 0, 0 },
-    { doingSomething6,   35000L, 0, 0 },
-    { doingSomething7,   40000L, 0, 0 },
-    { doingSomething8,   45000L, 0, 0 },
-    { doingSomething9,   50000L, 0, 0 },
-    { doingSomething10,  55000L, 0, 0 },
-    { doingSomething11,  60000L, 0, 0 },
-    { doingSomething12,  65000L, 0, 0 },
-    { doingSomething13,  70000L, 0, 0 },
-    { doingSomething14,  75000L, 0, 0 },
-    { doingSomething15,  80000L, 0, 0 }
-  };
-  
-  void doingSomething(int index)
-  {
-    unsigned long currentMillis  = millis();
-    
-    curISRTimerData[index].deltaMillis    = currentMillis - curISRTimerData[index].previousMillis;
-    curISRTimerData[index].previousMillis = currentMillis;
-  }
-
-#else
-
-  irqCallback irqCallbackFunc[NUMBER_ISR_TIMERS] =
-  {
-    doingSomething0,  doingSomething1,  doingSomething2,  doingSomething3,
-    doingSomething4,  doingSomething5,  doingSomething6,  doingSomething7,
-    doingSomething8,  doingSomething9,  doingSomething10, doingSomething11,
-    doingSomething12, doingSomething13, doingSomething14, doingSomething15
-  };
-
-#endif
-
-////////////////////////////////////////////////
-
-
-#define SIMPLE_TIMER_MS        2000L
-
-// Init SimpleTimer
-SimpleTimer simpleTimer;
-
-// Here is software Timer, you can do somewhat fancy stuffs without many issues.
-// But always avoid
-// 1. Long delay() it just doing nothing and pain-without-gain wasting CPU power.Plan and design your code / strategy ahead
-// 2. Very long "do", "while", "for" loops without predetermined exit time.
-void simpleTimerDoingSomething2s()
-{
-  static unsigned long previousMillis = startMillis;
-
-  unsigned long currMillis = millis();
-
-  Serial.print(F("SimpleTimer : "));Serial.print(SIMPLE_TIMER_MS / 1000);
-  Serial.print(F(", ms : ")); Serial.print(currMillis);
-  Serial.print(F(", Dms : ")); Serial.println(currMillis - previousMillis);
-
-  for (uint16_t i = 0; i < NUMBER_ISR_TIMERS; i++)
-  {
-#if USE_COMPLEX_STRUCT    
-    Serial.print(F("Timer : ")); Serial.print(i);
-    Serial.print(F(", programmed : ")); Serial.print(curISRTimerData[i].TimerInterval);
-    Serial.print(F(", actual : ")); Serial.println(curISRTimerData[i].deltaMillis);
-#else
-    Serial.print(F("Timer : ")); Serial.print(i);
-    Serial.print(F(", programmed : ")); Serial.print(TimerInterval[i]);
-    Serial.print(F(", actual : ")); Serial.println(deltaMillis[i]);
-#endif    
-  }
-
-  previousMillis = currMillis;
-}
-
-void setup() 
-{
-  pinMode(LED_BUILTIN, OUTPUT);
-
-  Serial.begin(115200);
-  while (!Serial);
-
-  Serial.print(F("\nStarting ISR_16_Timers_Array_Complex on "));
-  Serial.println(BOARD_NAME);
-  Serial.println(MEGA_AVR_TIMER_INTERRUPT_VERSION);
-  Serial.print(F("CPU Frequency = ")); Serial.print(F_CPU / 1000000); Serial.println(F(" MHz"));
-
-  Serial.print(F("TCB Clock Frequency = ")); 
-
-#if USING_16MHZ  
-  Serial.println(F("16MHz for highest accuracy"));
-#elif USING_8MHZ  
-  Serial.println(F("8MHz for very high accuracy"));
-#else
-  Serial.println(F("250KHz for lower accuracy but longer time"));
-#endif
-
-  ITimer1.init();
-
-  if (ITimer1.attachInterruptInterval(TIMER1_INTERVAL_MS, TimerHandler1))
-  {
-    Serial.print(F("Starting  ITimer1 OK, millis() = ")); Serial.println(millis());
-  }
-  else
-    Serial.println(F("Can't set ITimer1. Select another freq. or timer"));
-
-  //ISR_Timer1.setInterval(2000L, doingSomething2s);
-  //ISR_Timer1.setInterval(5000L, doingSomething5s);
-
-  // Just to demonstrate, don't use too many ISR Timers if not absolutely necessary
-  // You can use up to 16 timer for each ISR_Timer
-  for (uint16_t i = 0; i < NUMBER_ISR_TIMERS; i++)
-  {
-#if USE_COMPLEX_STRUCT
-    curISRTimerData[i].previousMillis = startMillis;
-    ISR_Timer1.setInterval(curISRTimerData[i].TimerInterval, curISRTimerData[i].irqCallbackFunc);
-#else
-    previousMillis[i] = startMillis;
-    ISR_Timer1.setInterval(TimerInterval[i], irqCallbackFunc[i]);
-#endif    
-  }
-
-  // You need this timer for non-critical tasks. Avoid abusing ISR if not absolutely necessary.
-  simpleTimer.setInterval(SIMPLE_TIMER_MS, simpleTimerDoingSomething2s);
-}
-
-#define BLOCKING_TIME_MS      10000L
-
-void loop()
-{
-  // This unadvised blocking task is used to demonstrate the blocking effects onto the execution and accuracy to Software timer
-  // You see the time elapse of ISR_Timer still accurate, whereas very unaccurate for Software Timer
-  // The time elapse for 2000ms software timer now becomes 3000ms (BLOCKING_TIME_MS)
-  // While that of ISR_Timer is still prefect.
-  delay(BLOCKING_TIME_MS);
-
-  // You need this Software timer for non-critical tasks. Avoid abusing ISR if not absolutely necessary
-  // You don't need to and never call ISR_Timer.run() here in the loop(). It's already handled by ISR timer.
-  simpleTimer.run();
-}
-```
 
 ---
 ---
@@ -795,7 +451,7 @@ While software timer, **programmed for 2s, is activated after more than 10.000s 
 
 ```
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.5.0
+megaAVR_TimerInterrupt v1.6.1
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 250KHz for lower accuracy but longer time
 Starting  ITimer1 OK, millis() = 6
@@ -945,7 +601,7 @@ The following is the sample terminal output when running example [Change_Interva
 
 ```
 Starting Change_Interval on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.5.0
+megaAVR_TimerInterrupt v1.6.1
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 250KHz for lower accuracy but longer time
 Starting  ITimer1 OK, millis() = 1
@@ -974,7 +630,7 @@ Changing Interval, Timer1 = 100,  Timer2 = 200
 
 ```
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.5.0
+megaAVR_TimerInterrupt v1.6.1
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 16MHz for highest accuracy
 Starting  ITimer1 OK, millis() = 6
@@ -1060,7 +716,7 @@ Timer : 15, programmed : 80000, actual : 80000
 ```
 
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.5.0
+megaAVR_TimerInterrupt v1.6.1
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 8MHz for very high accuracy
 Starting  ITimer1 OK, millis() = 10
@@ -1128,7 +784,7 @@ Timer : 15, programmed : 80000, actual : 80000
 
 ```
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.5.0
+megaAVR_TimerInterrupt v1.6.1
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 250KHz for lower accuracy but longer time
 Starting  ITimer1 OK, millis() = 11
@@ -1214,7 +870,7 @@ The following is the sample terminal output when running example [Change_Interva
 
 ```
 Starting Change_Interval_HF on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.5.0
+megaAVR_TimerInterrupt v1.6.1
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 16MHz for highest accuracy
 [TISR] TCB 1
@@ -1253,7 +909,7 @@ While software timer, **programmed for 2s, is activated after more than 10.000s 
 
 ```
 Starting ISR_16_Timers_Array_Complex on MegaCoreX ATmega4809
-megaAVR_TimerInterrupt v1.6.0
+megaAVR_TimerInterrupt v1.6.1
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 16MHz for highest accuracy
 [TISR] TCB1

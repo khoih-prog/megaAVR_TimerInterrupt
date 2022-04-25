@@ -9,6 +9,7 @@
 ## Table of Contents
 
 * [Changelog](#changelog)
+  * [Release v1.6.1](#release-v161)
   * [Release v1.6.0](#release-v160)
   * [Release v1.5.0](#release-v150)
   * [Release v1.4.0](#release-v140)
@@ -21,6 +22,12 @@
 ---
 
 ## Changelog
+
+### Release v1.6.1
+
+1. Suppress warnings when `_TIMERINTERRUPT_LOGLEVEL_` < 2
+2. Remove unused `_prescalerIndex`
+
 
 ### Release v1.6.0
 
