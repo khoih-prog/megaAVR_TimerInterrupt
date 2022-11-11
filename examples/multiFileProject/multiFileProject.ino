@@ -19,7 +19,7 @@
       defined(ARDUINO_AVR_ATmega4809) || defined(ARDUINO_AVR_ATmega4808) || defined(ARDUINO_AVR_ATmega3209) || \
       defined(ARDUINO_AVR_ATmega3208) || defined(ARDUINO_AVR_ATmega1609) || defined(ARDUINO_AVR_ATmega1608) || \
       defined(ARDUINO_AVR_ATmega809) || defined(ARDUINO_AVR_ATmega808) )
-  #error This is designed only for Arduino or MegaCoreX megaAVR board! Please check your Tools->Board setting
+#error This is designed only for Arduino or MegaCoreX megaAVR board! Please check your Tools->Board setting
 #endif
 
 #include "multiFileProject.h"
@@ -30,12 +30,12 @@
 // To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
 #include "megaAVR_ISR_Timer.h"
 
-void setup() 
+void setup()
 {
-  // put your setup code here, to run once:
+	// put your setup code here, to run once:
 }
 
-void loop() 
+void loop()
 {
-  // put your main code here, to run repeatedly:
+	// put your main code here, to run repeatedly:
 }

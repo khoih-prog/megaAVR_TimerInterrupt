@@ -12,7 +12,7 @@
   Therefore, their executions are not blocked by bad-behaving functions / tasks.
   This important feature is absolutely necessary for mission-critical tasks.
 
-  Version: 1.6.1
+  Version: 1.7.0
 
   Version Modified By   Date      Comments
   ------- -----------  ---------- -----------
@@ -24,6 +24,7 @@
   1.5.0   K.Hoang      22/01/2022 Fix `multiple-definitions` linker error
   1.6.0   K.Hoang      05/02/2022 Add support to MegaCoreX core
   1.6.1   K.Hoang      25/04/2022 Suppress warnings when _TIMERINTERRUPT_LOGLEVEL_ < 2
+  1.7.0   K.Hoang      11/11/2022 Fix bug disabling TCB0
 ****************************************************************************************************************************/
 
 #pragma once
