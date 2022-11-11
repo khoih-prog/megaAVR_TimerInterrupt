@@ -8,6 +8,8 @@
 
 <a href="https://www.buymeacoffee.com/khoihprog6" title="Donate to my libraries using BuyMeACoffee"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Donate to my libraries using BuyMeACoffee" style="height: 50px !important;width: 181px !important;" ></a>
 <a href="https://www.buymeacoffee.com/khoihprog6" title="Donate to my libraries using BuyMeACoffee"><img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-orange.svg?logo=buy-me-a-coffee&logoColor=FFDD00" style="height: 20px !important;width: 200px !important;" ></a>
+<a href="https://profile-counter.glitch.me/khoih-prog/count.svg" title="Total Visitor count"><img src="https://profile-counter.glitch.me/khoih-prog/count.svg" style="height: 30px;width: 200px;"></a>
+<a href="https://profile-counter.glitch.me/khoih-prog-megaAVR_TimerInterrupt/count.svg" title="Visitor count"><img src="https://profile-counter.glitch.me/khoih-prog-megaAVR_TimerInterrupt/count.svg" style="height: 30px;width: 200px;"></a>
 
 
 ---
@@ -140,7 +142,7 @@ The catch is your function is now part of an ISR (Interrupt Service Routine), an
 
 1. [`Arduino IDE 1.8.19+` for Arduino](https://github.com/arduino/Arduino). [![GitHub release](https://img.shields.io/github/release/arduino/Arduino.svg)](https://github.com/arduino/Arduino/releases/latest)
 2. [`Arduino megaAVR core 1.8.7+`](https://github.com/arduino/ArduinoCore-megaavr/releases) for Arduino megaAVR boards. Use Arduino Board Manager to install.
-3. [`MegaCoreX megaAVR core 1.0.10+`](https://github.com/MCUdude/MegaCoreX/releases) for Arduino megaAVR boards.  [![GitHub release](https://img.shields.io/github/release/MCUdude/MegaCoreX.svg)](https://github.com/MCUdude/MegaCoreX/releases/latest). Follow [**How to install**](https://github.com/MCUdude/MegaCoreX#how-to-install).
+3. [`MegaCoreX megaAVR core 1.1.0+`](https://github.com/MCUdude/MegaCoreX/releases) for Arduino megaAVR boards.  [![GitHub release](https://img.shields.io/github/release/MCUdude/MegaCoreX.svg)](https://github.com/MCUdude/MegaCoreX/releases/latest). Follow [**How to install**](https://github.com/MCUdude/MegaCoreX#how-to-install).
 4. To use with certain example
    - [`SimpleTimer library`](https://github.com/jfturcot/SimpleTimer) for [ISR_Timers_Array_Simple](examples/ISR_Timers_Array_Simple) and [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex) examples.
    
@@ -159,9 +161,9 @@ You can also use this link [![arduino-library-badge](https://www.ardu-badge.com/
 Another way to install is to:
 
 1. Navigate to [**megaAVR_TimerInterrupt**](https://github.com/khoih-prog/megaAVR_TimerInterrupt) page.
-2. Download the latest release `megaAVR_TimerInterrupt-master.zip`.
-3. Extract the zip file to `megaAVR_TimerInterrupt-master` directory 
-4. Copy whole `megaAVR_TimerInterrupt-master` folder to Arduino libraries' directory such as `~/Arduino/libraries/`.
+2. Download the latest release `megaAVR_TimerInterrupt-main.zip`.
+3. Extract the zip file to `megaAVR_TimerInterrupt-main` directory 
+4. Copy whole `megaAVR_TimerInterrupt-main` folder to Arduino libraries' directory such as `~/Arduino/libraries/`.
 
 ### VS Code & PlatformIO:
 
@@ -179,7 +181,7 @@ The current library implementation, using `xyz-Impl.h` instead of standard `xyz.
 
 You can include these `.hpp` files
 
-```
+```cpp
 // Can be included as many times as necessary, without `Multiple Definitions` Linker Error
 #include "megaAVR_TimerInterrupt.hpp"   //https://github.com/khoih-prog/megaAVR_TimerInterrupt
 
@@ -189,7 +191,7 @@ You can include these `.hpp` files
 
 in many files. But be sure to use the following `.h` files **in just 1 `.h`, `.cpp` or `.ino` file**, which must **not be included in any other file**, to avoid `Multiple Definitions` Linker Error
 
-```
+```cpp
 // To be included only in main(), .ino with setup() to avoid `Multiple Definitions` Linker Error
 #include "megaAVR_TimerInterrupt.h"     //https://github.com/khoih-prog/megaAVR_TimerInterrupt
 
@@ -224,7 +226,7 @@ Before using any Timer, you have to make sure the Timer has not been used by any
 
 ### 1.1 Init Hardware Timer
 
-```
+```cpp
 // Select USING_16MHZ     == true for  16MHz to Timer TCBx => shorter timer, but better accuracy
 // Select USING_8MHZ      == true for   8MHz to Timer TCBx => shorter timer, but better accuracy
 // Select USING_250KHZ    == true for 250KHz to Timer TCBx => shorter timer, but better accuracy
@@ -247,7 +249,7 @@ ITimer1.init();
 
 Use one of these functions with **interval in unsigned long milliseconds**
 
-```
+```cpp
 // interval (in ms) and duration (in milliseconds). Duration = 0 or not specified => run indefinitely
 template<typename TArg> bool setInterval(unsigned long interval, void (*callback)(TArg), TArg params, unsigned long duration = 0);
 
@@ -263,7 +265,7 @@ bool attachInterruptInterval(unsigned long interval, timer_callback callback, un
 
 as follows
 
-```
+```cpp
 void TimerHandler1()
 {
   // Doing something here inside ISR
@@ -287,7 +289,7 @@ void setup()
 
 Use one of these functions with **frequency in float Hz**
 
-```
+```cpp
 // frequency (in hertz) and duration (in milliseconds). Duration = 0 or not specified => run indefinitely
 bool setFrequency(float frequency, timer_callback_p callback, /* void* */ uint32_t params, unsigned long duration = 0);
 
@@ -303,7 +305,7 @@ bool attachInterrupt(float frequency, timer_callback callback, unsigned long dur
 
 as follows
 
-```
+```cpp
 void TimerHandler1()
 {
   // Doing something here inside ISR
@@ -332,7 +334,7 @@ The 16 ISR_based Timers, designed for long timer intervals, only support using *
 
 ### 2.2 Init Hardware Timer and ISR-based Timer
 
-```
+```cpp
 // Select USING_16MHZ     == true for  16MHz to Timer TCBx => shorter timer, but better accuracy
 // Select USING_8MHZ      == true for   8MHz to Timer TCBx => shorter timer, but better accuracy
 // Select USING_250KHZ    == true for 250KHz to Timer TCBx => shorter timer, but better accuracy
@@ -353,7 +355,7 @@ ISR_Timer ISR_Timer1;
 
 ### 2.3 Set Hardware Timer Interval and attach Timer Interrupt Handler functions
 
-```
+```cpp
 void TimerHandler()
 {
   ISR_Timer1.run();
@@ -435,7 +437,7 @@ void setup()
 
 ### Example [ISR_16_Timers_Array_Complex](examples/ISR_16_Timers_Array_Complex)
 
-https://github.com/khoih-prog/megaAVR_TimerInterrupt/blob/97ef20cef96bbc9f8e9d22505605707f6fc72f5a/examples/ISR_16_Timers_Array_Complex/ISR_16_Timers_Array_Complex.ino#L16-L360
+https://github.com/khoih-prog/megaAVR_TimerInterrupt/blob/59d45e43d51518de3034f22c8a2409afd0714e4e/examples/ISR_16_Timers_Array_Complex/ISR_16_Timers_Array_Complex.ino#L16-L373
 
 
 ---
@@ -451,7 +453,7 @@ While software timer, **programmed for 2s, is activated after more than 10.000s 
 
 ```
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.6.1
+megaAVR_TimerInterrupt v1.7.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 250KHz for lower accuracy but longer time
 Starting  ITimer1 OK, millis() = 6
@@ -601,7 +603,7 @@ The following is the sample terminal output when running example [Change_Interva
 
 ```
 Starting Change_Interval on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.6.1
+megaAVR_TimerInterrupt v1.7.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 250KHz for lower accuracy but longer time
 Starting  ITimer1 OK, millis() = 1
@@ -630,7 +632,7 @@ Changing Interval, Timer1 = 100,  Timer2 = 200
 
 ```
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.6.1
+megaAVR_TimerInterrupt v1.7.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 16MHz for highest accuracy
 Starting  ITimer1 OK, millis() = 6
@@ -716,7 +718,7 @@ Timer : 15, programmed : 80000, actual : 80000
 ```
 
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.6.1
+megaAVR_TimerInterrupt v1.7.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 8MHz for very high accuracy
 Starting  ITimer1 OK, millis() = 10
@@ -784,7 +786,7 @@ Timer : 15, programmed : 80000, actual : 80000
 
 ```
 Starting ISR_16_Timers_Array_Complex on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.6.1
+megaAVR_TimerInterrupt v1.7.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 250KHz for lower accuracy but longer time
 Starting  ITimer1 OK, millis() = 11
@@ -870,7 +872,7 @@ The following is the sample terminal output when running example [Change_Interva
 
 ```
 Starting Change_Interval_HF on megaAVR Nano Every
-megaAVR_TimerInterrupt v1.6.1
+megaAVR_TimerInterrupt v1.7.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 16MHz for highest accuracy
 [TISR] TCB 1
@@ -909,7 +911,7 @@ While software timer, **programmed for 2s, is activated after more than 10.000s 
 
 ```
 Starting ISR_16_Timers_Array_Complex on MegaCoreX ATmega4809
-megaAVR_TimerInterrupt v1.6.1
+megaAVR_TimerInterrupt v1.7.0
 CPU Frequency = 16 MHz
 TCB Clock Frequency = 16MHz for highest accuracy
 [TISR] TCB1
@@ -1112,12 +1114,12 @@ Submit issues to: [megaAVR_TimerInterrupt issues](https://github.com/khoih-prog/
  5. Fix some bugs in v1.0.0
  6. Add more examples.
  7. Similar library for ESP32, ESP8266, SAMD21/SAMD51, nRF52, Mbed-OS Nano-33-BLE, STM32
- 8. Add support to ATmega4809-based boards, such as **Arduino UNO WiFi Rev2, AVR_NANO_EVERY, etc.**
+ 8. Add support to `ATmega4809-based` boards, such as **Arduino UNO WiFi Rev2, AVR_NANO_EVERY, etc.**
  9. Selectable **TCB Clock 16MHz, 8MHz or 250KHz** depending on necessary accuracy
 10. Fix `multiple-definitions` linker error
 11. Optimize library code by using `reference-passing` instead of `value-passing`
-12. Add support to `MegaCoreX` core, including ATmega4809, ATmega4808, ATmega3209, ATmega3208, ATmega1609, ATmega1608, ATmega809 and ATmega808
-
+12. Add support to `MegaCoreX` core, including `ATmega4809, ATmega4808, ATmega3209, ATmega3208, ATmega1609, ATmega1608, ATmega809 and ATmega808`
+13. Use `allman astyle` and add `utils`
 
 ---
 ---
@@ -1127,12 +1129,14 @@ Submit issues to: [megaAVR_TimerInterrupt issues](https://github.com/khoih-prog/
 Many thanks for everyone for bug reporting, new feature suggesting, testing and contributing to the development of this library. Especially to these people who have directly or indirectly contributed to this [megaAVR_TimerInterrupt library](https://github.com/khoih-prog/megaAVR_TimerInterrupt)
 
 1. Thanks to good work of [Miguel Wisintainer](https://github.com/tcpipchip) for initiating, inspriring, working with, developing, debugging, testing and maintaining.
-2. Thanks to [Bill Wuttke](https://github.com/wcwuttke) to report the issue [Interrupt interval 2X requested interval #1](https://github.com/khoih-prog/megaAVR_TimerInterrupt/issues/1) leading to new release v1.4.0 to fix bug in using higher frequencies than 250Hz.
+2. Thanks to [Bill Wuttke](https://github.com/wcwuttke) to report the issue [Interrupt interval 2X requested interval #1](https://github.com/khoih-prog/megaAVR_TimerInterrupt/issues/1) leading to new release v1.4.0 to fix bug in using higher frequencies than 250Hz
+3. Thanks to [cattledogGH](https://github.com/cattledogGH) to report the issue [Interrupt interval 2X requested interval #1](https://github.com/khoih-prog/megaAVR_TimerInterrupt/issues/1) leading to new release v1.7.0 to fix bug disabling `TCB0`
 
 <table>
   <tr>
     <td align="center"><a href="https://github.com/tcpipchip"><img src="https://github.com/tcpipchip.png" width="100px;" alt="tcpipchip"/><br/><sub><b>⭐️ Miguel Wisintainer</b></sub></a><br/></td>
     <td align="center"><a href="https://github.com/wcwuttke"><img src="https://github.com/wcwuttke.png" width="100px;" alt="wcwuttke"/><br/><sub><b>Bill Wuttke</b></sub></a><br/></td>
+    <td align="center"><a href="https://github.com/cattledogGH"><img src="https://github.com/cattledogGH.png" width="100px;" alt="cattledogGH"/><br/><sub><b>cattledogGH</b></sub></a><br/></td>
   </tr> 
 </table>
 
