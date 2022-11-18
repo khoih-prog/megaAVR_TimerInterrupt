@@ -78,7 +78,7 @@
 
 ### Initial Release v1.0.0
 
-1. Intial release to support to ATmega4809-based boards, such as **Arduino UNO WiFi Rev2, AVR_NANO_EVERY, etc.**
+1. Initial release to support to ATmega4809-based boards, such as **Arduino UNO WiFi Rev2, AVR_NANO_EVERY, etc.**
 2. New examples to support Blynk using [**WiFiNINA_Generic**](https://github.com/khoih-prog/WiFiNINA_Generic) and [**Blynk_WiFiNINA_WM**](https://github.com/khoih-prog/Blynk_WiFiNINA_WM) libraries.
 
 
